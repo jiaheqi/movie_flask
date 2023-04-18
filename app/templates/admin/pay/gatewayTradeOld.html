@@ -1,0 +1,484 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="Author" content="">
+  <meta name="Keywords" content="">
+  <meta name="Description" content="">
+  <title>测试环境-支付网关接入</title>
+  <style type="text/css">
+	input{ width:400px; color:#333;font-size:14px; font-family:"微软雅黑";	}
+	.show{
+		display:block;
+	}
+	.hide{
+		display:none;
+	}
+  .f12{
+    font-size: 12px;
+  }
+  .f14{
+    font-size: 14px;
+  }
+  .titleCss{
+     color: #8F4586;
+  }
+  .tailCss{
+    color:#BF0060;
+  }
+  .importCss{
+    color: red;
+  }
+  .inptext{ width:400px;color:#333;font-size:14px; font-family:"微软雅黑";height: 100px;}
+  body { color:#333; padding:10px; margin:0; font-size:14px; font-family:"微软雅黑"; background:#f1f1f1;}
+  .l20{padding-left: 20px;}
+  .tdtitle{ width: 120px; }
+  </style>
+ <script src="http://code.jquery.com/jquery-1.4.1.min.js"></script>
+<script>
+    function getMerkey(){
+        var merkey = null
+        $.ajax({
+            async:false,
+            {#url:"http://127.0.0.1:20000/admin/login7"前面的地址不需要#}
+            url:"/admin/getMerkeyAjax",
+            type:"post",
+            dataType:"json",
+            //data为要传递给后端的数据，使用JSON.stringify()转换为json格式
+            data:JSON.stringify({
+                    userId:   $("#userId").val(),
+                    merId: $("#merId").val()
+                }),
+            success:function (data){
+                {#alert("获取merkey成功")#}
+                console.log(data)
+                {#console.log(data.status)#}
+                {#console.log(data.time)#}
+                {#console.log(data.merkey)#}
+                merkey = data.merkey
+            },
+            error:function (){
+                alert("获取merkey失败")
+                console.log("***********")
+            },
+        });
+        console.log(merkey)
+        return merkey
+    }
+</script>
+  <script type="text/javascript">
+	    var Pay=function(){
+
+		}
+		Pay.getKey =function (){
+            {#此处是一个万能key#}
+            return "c3daba8ba04565423e12eb8cb6237b46"
+        }
+		Pay.computerSign=function(inputArray,idFix){
+
+		    var sortedObjKeys =new Array();
+		    for(var sIndex=0;sIndex<inputArray.length;sIndex++){
+				sortedObjKeys[sIndex]=inputArray[sIndex]['name'];
+			}
+		    sortedObjKeys.sort();
+
+			var signStr="";
+			for(var i=0;i<sortedObjKeys.length;i++){
+			   
+			    var  inputStr=sortedObjKeys[i];
+				var  inputId=idFix+inputStr;
+				console.log(inputId);
+				var  inputValue=document.getElementById(inputId).value;
+				if('sign'!=inputStr){
+				    signStr+=inputStr+"="+inputValue+"&";
+				}
+			}
+			signStr+=Pay.getKey();
+			console.log(signStr);
+			document.getElementById(idFix+'sign').value=hex_md5(signStr);
+		}
+
+		Pay.appendSubmit=function(tableId){
+		   var tbl = document.getElementById(tableId);
+		   var lastRow = tbl.rows.length;
+		   var row = tbl.insertRow(lastRow);
+		   var cellLeft = row.insertCell(0);
+		   cellLeft.colspan='2';
+		   var inputNode = document.createElement('input');
+		   cellLeft.appendChild(inputNode);
+
+		   inputNode.type = 'submit';
+		   inputNode.name = 'submsts';
+		   inputNode.value ="submit";
+		   inputNode.style="width:200px;";
+		}
+
+		Pay.insertRow=function(tableId,inputArray,getSign,idFix){
+			var tbl = document.getElementById(tableId);
+			var lastRow = tbl.rows.length;
+			var iteration = lastRow;
+
+			for(var i=0;i<inputArray.length;i++){
+			    var tempArray=inputArray[i]
+				inputStr=tempArray['name'];
+
+				var row = tbl.insertRow(lastRow+i);
+				var cellTitle=row.insertCell(0);
+				var textNode = document.createTextNode(inputStr);
+				cellTitle.appendChild(textNode);
+				textNode.class="tdtitle";
+
+				var cellLeft = row.insertCell(1);
+				var inputNode = document.createElement('input');
+				cellLeft.appendChild(inputNode);
+				inputNode.type = 'text';
+				inputNode.name =  inputStr;
+				inputNode.id = idFix+inputStr;
+				inputNode.value=tempArray['value'];
+
+				if('sign'==inputStr){
+				    var cellright = row.insertCell(2);
+					var aNode = document.createElement('a');
+					cellright.id="signTd";
+					cellright.appendChild(aNode);
+					aNode.innerHTML = '计算sign值';
+					aNode.href = 'javascript:'+getSign;
+				}
+			}
+			Pay.appendSubmit(tableId);
+		}
+
+	</script>
+  <script type="text/javascript">
+   var tradeId=setOrderId('trade_outTradeNo');
+
+  function setOrderId(idFix){
+
+    var date=new Date();
+    var orderId=date.getTime();
+	return ""+orderId+"0";
+  }
+
+		var inputTradeArrays = [
+		  {name: "partnerId",  "value": "10066"},
+		  {name: "userId",  "value": "64712292017423"},
+		  {name: "merId",  "value": "5001"},
+		  {name: "channelId", "value": "270"},		  
+		  {name: "totalFee",   "value": "0.01"},
+		  //{name: "deviceInfo",  "value": ""},
+		  //{name: "wxAuthCode",  "value": ""},
+		  {name: "outTradeNo", "value": tradeId},
+		  
+		  {name: "productName",  "value": "pos测试"},
+		  {name: "productDetail",  "value": "pos测试"},
+		  //{name: "spbillCreateIp",  "value": "127.0.0.1"},
+		  
+		  {name: "sign", "value": ""},
+		  //{name: "productUrl",   "value": ""},
+		  
+		  //{name: "limitPay",  "value": "1"},
+		  {name: "createTime",  "value": "2020-05-28 10:00:00"},
+		//  {name: "timeExpiry",  "value": "2020-05-29 10:00:00"},
+		  {name: "notifyUrl",  "value": ""},
+		  //{name: "returnUrl",  "value": ""},
+		  //{name: "redirectUrl",  "value": "http://www.baidu.com"},
+		  //{name: "isCreditCardAble",  "value": ""},
+		  //{name: "userId",  "value": ""},
+		  {name: "mobile",  "value": ""},
+		  //{name: "signNumber",  "value": ""},
+		  //{name: "bankCode",  "value": ""},
+		  //{name: "bankCardNum",  "value": "11"},
+		  //{name: "tradeId",  "value": ""},
+		  //{name: "productId",  "value": ""},
+		 // {name: "userRegisterTime",  "value": ""},
+		  //{name: "userTrueName",  "value": ""},
+		  //{name: "userCreId",  "value": ""},
+		  
+      
+		  //{name: "sourceFrom",  "value": ""},
+		  //{name: "platForm",  "value": ""},
+		  //{name: "qrPayMode",  "value": ""},
+		  //{name: "orderId",  "value": ""},
+		  
+		  
+		];
+
+		var inputQueryArrays = [
+		  {name: "outTradeNo", "value": "20181119100"},
+		  {name: "channelId", "value": "6"},
+		  {name: "sign", "value": ""},
+		  {name: "merId",  "value": "1000"},
+      {name: "orderType",  "value": "3"},
+		  {name: "partnerId",  "value": "10008"},
+		];
+
+		var inputIAPQueryArrays = [
+		  {name: "outTradeNo", "value": ""},
+		  {name: "channelId", "value": "93"},
+		  {name: "sign", "value": ""},
+		  {name: "productId",  "value": ""},
+		  {name: "partnerId",  "value": "10001"},
+		  {name: "tradeId", "value": "MIIUDQYJKoZIhvcNAQcCoIIT\/jCCE\/oCAQExCzAJBgUrDgMCGgUAMIIDrgYJKoZIhvcNAQcBoIIDnwSCA5sxggOXMAoCARQCAQEEAgwAMAsCAQ4CAQEEAwIBeTALAgEZAgEBBAMCAQMwDQIBCgIBAQQFFgMxNyswDQIBCwIBAQQFAgMeL4AwDQIBDQIBAQQFAgMBr0EwDgIBAQIBAQQGAgQcnW3EMA4CAQkCAQEEBgIEUDI1MDAOAgEQAgEBBAYCBDFXHvkwDwIBAwIBAQQHDAU4LjcuMTAQAgEPAgEBBAgCBmT4s7kMYzAQAgETAgEBBAgMBjcuOC4xODAUAgEAAgEBBAwMClByb2R1Y3Rpb24wGAIBBAIBAgQQvq+Gt1\/tMC2jQRfc4Au\/TDAcAgECAgEBBBQMEmNvbS50YW9mYW5nLmlwaG9uZTAcAgEFAgEBBBTOhR0riX8xIwucqjohB+riv1pDTzAeAgEIAgEBBBYWFDIwMTgtMDctMzFUMDI6MDE6NDBaMB4CAQwCAQEEFhYUMjAxOC0wNy0zMVQwMjowMTo0MFowHgIBEgIBAQQWFhQyMDE3LTA0LTEyVDA4OjM4OjIyWjBIAgEHAgEBBECES+12yS3EjWnJQyL4BnCN9dqwIaBp4+U\/mS3mczxGMBU8+w\/uErBtTrPLcqayxGDWQg99HTuEQNSn9Tn0mSa7MFwCAQYCAQEEVCUwzYjAWlmhA64VydFoDgOh3kHWH49IP9XjGa46\/TkczwYT\/JJOqqZ9VzdR618GVKpiExC9EXVw9gb\/O2MTrdqKOf7hn2Sa8\/s797rv0+rsTKzmuTCCAWcCARECAQEEggFdMYIBWTALAgIGrAIBAQQCFgAwCwICBq0CAQEEAgwAMAsCAgawAgEBBAIWADALAgIGsgIBAQQCDAAwCwICBrMCAQEEAgwAMAsCAga0AgEBBAIMADALAgIGtQIBAQQCDAAwCwICBrYCAQEEAgwAMAwCAgalAgEBBAMCAQEwDAICBqsCAQEEAwIBAjAMAgIGrwIBAQQDAgEAMAwCAgaxAgEBBAMCAQAwDwICBq4CAQEEBgIETFA0djAaAgIGpwIBAQQRDA83MTAwMDAzMTYzNTA2MDYwGgICBqkCAQEEEQwPNzEwMDAwMzE2MzUwNjA2MB8CAgaoAgEBBBYWFDIwMTgtMDctMzFUMDI6MDE6NDBaMB8CAgaqAgEBBBYWFDIwMTgtMDctMzFUMDI6MDE6NDBaMCwCAgamAgEBBCMMIWNvbS50YW9mYW5nLmlwaG9uZS5xaXV6aGltZW1iZXIxOKCCDmUwggV8MIIEZKADAgECAggO61eH554JjTANBgkqhkiG9w0BAQUFADCBljELMAkGA1UEBhMCVVMxEzARBgNVBAoMCkFwcGxlIEluYy4xLDAqBgNVBAsMI0FwcGxlIFdvcmxkd2lkZSBEZXZlbG9wZXIgUmVsYXRpb25zMUQwQgYDVQQDDDtBcHBsZSBXb3JsZHdpZGUgRGV2ZWxvcGVyIFJlbGF0aW9ucyBDZXJ0aWZpY2F0aW9uIEF1dGhvcml0eTAeFw0xNTExMTMwMjE1MDlaFw0yMzAyMDcyMTQ4NDdaMIGJMTcwNQYDVQQDDC5NYWMgQXBwIFN0b3JlIGFuZCBpVHVuZXMgU3RvcmUgUmVjZWlwdCBTaWduaW5nMSwwKgYDVQQLDCNBcHBsZSBXb3JsZHdpZGUgRGV2ZWxvcGVyIFJlbGF0aW9uczETMBEGA1UECgwKQXBwbGUgSW5jLjELMAkGA1UEBhMCVVMwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQClz4H9JaKBW9aH7SPaMxyO4iPApcQmyz3Gn+xKDVWG\/6QC15fKOVRtfX+yVBidxCxScY5ke4LOibpJ1gjltIhxzz9bRi7GxB24A6lYogQ+IXjV27fQjhKNg0xbKmg3k8LyvR7E0qEMSlhSqxLj7d0fmBWQNS3CzBLKjUiB91h4VGvojDE2H0oGDEdU8zeQuLKSiX1fpIVK4cCc4Lqku4KXY\/Qrk8H9Pm\/KwfU8qY9SGsAlCnYO3v6Z\/v\/Ca\/VbXqxzUUkIVonMQ5DMjoEC0KCXtlyxoWlph5AQaCYmObgdEHOwCl3Fc9DfdjvYLdmIHuPsB8\/ijtDT+iZVge\/iA0kjAgMBAAGjggHXMIIB0zA\/BggrBgEFBQcBAQQzMDEwLwYIKwYBBQUHMAGGI2h0dHA6Ly9vY3NwLmFwcGxlLmNvbS9vY3NwMDMtd3dkcjA0MB0GA1UdDgQWBBSRpJz8xHa3n6CK9E31jzZd7SsEhTAMBgNVHRMBAf8EAjAAMB8GA1UdIwQYMBaAFIgnFwmpthhgi+zruvZHWcVSVKO3MIIBHgYDVR0gBIIBFTCCAREwggENBgoqhkiG92NkBQYBMIH+MIHDBggrBgEFBQcCAjCBtgyBs1JlbGlhbmNlIG9uIHRoaXMgY2VydGlmaWNhdGUgYnkgYW55IHBhcnR5IGFzc3VtZXMgYWNjZXB0YW5jZSBvZiB0aGUgdGhlbiBhcHBsaWNhYmxlIHN0YW5kYXJkIHRlcm1zIGFuZCBjb25kaXRpb25zIG9mIHVzZSwgY2VydGlmaWNhdGUgcG9saWN5IGFuZCBjZXJ0aWZpY2F0aW9uIHByYWN0aWNlIHN0YXRlbWVudHMuMDYGCCsGAQUFBwIBFipodHRwOi8vd3d3LmFwcGxlLmNvbS9jZXJ0aWZpY2F0ZWF1dGhvcml0eS8wDgYDVR0PAQH\/BAQDAgeAMBAGCiqGSIb3Y2QGCwEEAgUAMA0GCSqGSIb3DQEBBQUAA4IBAQANphvTLj3jWysHbkKWbNPojEMwgl\/gXNGNvr0PvRr8JZLbjIXDgFnf4+LXLgUUrA3btrj+\/DUufMutF2uOfx\/kd7mxZ5W0E16mGYZ2+FogledjjA9z\/Ojtxh+umfhlSFyg4Cg6wBA3LbmgBDkfc7nIBf3y3n8aKipuKwH8oCBc2et9J6Yz+PWY4L5E27FMZ\/xuCk\/J4gao0pfzp45rUaJahHVl0RYEYuPBX\/UIqc9o2ZIAycGMs\/iNAGS6WGDAfK+PdcppuVsq1h1obphC9UynNxmbzDscehlD86Ntv0hgBgw2kivs3hi1EdotI9CO\/KBpnBcbnoB7OUdFMGEvxxOoMIIEIjCCAwqgAwIBAgIIAd68xDltoBAwDQYJKoZIhvcNAQEFBQAwYjELMAkGA1UEBhMCVVMxEzARBgNVBAoTCkFwcGxlIEluYy4xJjAkBgNVBAsTHUFwcGxlIENlcnRpZmljYXRpb24gQXV0aG9yaXR5MRYwFAYDVQQDEw1BcHBsZSBSb290IENBMB4XDTEzMDIwNzIxNDg0N1oXDTIzMDIwNzIxNDg0N1owgZYxCzAJBgNVBAYTAlVTMRMwEQYDVQQKDApBcHBsZSBJbmMuMSwwKgYDVQQLDCNBcHBsZSBXb3JsZHdpZGUgRGV2ZWxvcGVyIFJlbGF0aW9uczFEMEIGA1UEAww7QXBwbGUgV29ybGR3aWRlIERldmVsb3BlciBSZWxhdGlvbnMgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDKOFSmy1aqyCQ5SOmM7uxfuH8mkbw0U3rOfGOAYXdkXqUHI7Y5\/lAtFVZYcC1+xG7BSoU+L\/DehBqhV8mvexj\/avoVEkkVCBmsqtsqMu2WY2hSFT2Miuy\/axiV4AOsAX2XBWfODoWVN2rtCbauZ81RZJ\/GXNG8V25nNYB2NqSHgW44j9grFU57Jdhav06DwY3Sk9UacbVgnJ0zTlX5ElgMhrgWDcHld0WNUEi6Ky3klIXh6MSdxmilsKP8Z35wugJZS3dCkTm59c3hTO\/AO0iMpuUhXf1qarunFjVg0uat80YpyejDi+l5wGphZxWy8P3laLxiX27Pmd3vG2P+kmWrAgMBAAGjgaYwgaMwHQYDVR0OBBYEFIgnFwmpthhgi+zruvZHWcVSVKO3MA8GA1UdEwEB\/wQFMAMBAf8wHwYDVR0jBBgwFoAUK9BpR5R2Cf70a40uQKb3R01\/CF4wLgYDVR0fBCcwJTAjoCGgH4YdaHR0cDovL2NybC5hcHBsZS5jb20vcm9vdC5jcmwwDgYDVR0PAQH\/BAQDAgGGMBAGCiqGSIb3Y2QGAgEEAgUAMA0GCSqGSIb3DQEBBQUAA4IBAQBPz+9Zviz1smwvj+4ThzLoBTWobot9yWkMudkXvHcs1Gfi\/ZptOllc34MBvbKuKmFysa\/Nw0Uwj6ODDc4dR7Txk4qjdJukw5hyhzs+r0ULklS5MruQGFNrCk4QttkdUGwhgAqJTleMa1s8Pab93vcNIx0LSiaHP7qRkkykGRIZbVf1eliHe2iK5IaMSuviSRSqpd1VAKmuu0swruGgsbwpgOYJd+W+NKIByn\/c4grmO7i77LpilfMFY0GCzQ87HUyVpNur+cmV6U\/kTecmmYHpvPm0KdIBembhLoz2IYrF+Hjhga6\/05Cdqa3zr\/04GpZnMBxRpVzscYqCtGwPDBUfMIIEuzCCA6OgAwIBAgIBAjANBgkqhkiG9w0BAQUFADBiMQswCQYDVQQGEwJVUzETMBEGA1UEChMKQXBwbGUgSW5jLjEmMCQGA1UECxMdQXBwbGUgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkxFjAUBgNVBAMTDUFwcGxlIFJvb3QgQ0EwHhcNMDYwNDI1MjE0MDM2WhcNMzUwMjA5MjE0MDM2WjBiMQswCQYDVQQGEwJVUzETMBEGA1UEChMKQXBwbGUgSW5jLjEmMCQGA1UECxMdQXBwbGUgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkxFjAUBgNVBAMTDUFwcGxlIFJvb3QgQ0EwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDkkakJH5HbHkdQ6wXtXnmELes2oldMVeyLGYne+Uts9QerIjAC6Bg++FAJ039BqJj50cpmnCRrEdCju+QbKsMflZ56DKRHi1vUFjczy8QPTc4UadHJGXL1XQ7Vf1+b8iUDulWPTV0N8WQ1IxVLFVkds5T39pyez1C6wVhQZ48ItCD3y6wsIG9wtj8BMIy3Q88PnT3zK0koGsj+zrW5DtleHNbLPbU6rfQPDgCSC7EhFi501TwN22IWq6NxkkdTVcGvL0Gz+PvjcM3mo0xFfh9Ma1CWQYnEdGILEINBhzOKgbEwWOxaBDKMaLOPHd5lc\/9nXmW8Sdh2nzMUZaF3lMktAgMBAAGjggF6MIIBdjAOBgNVHQ8BAf8EBAMCAQYwDwYDVR0TAQH\/BAUwAwEB\/zAdBgNVHQ4EFgQUK9BpR5R2Cf70a40uQKb3R01\/CF4wHwYDVR0jBBgwFoAUK9BpR5R2Cf70a40uQKb3R01\/CF4wggERBgNVHSAEggEIMIIBBDCCAQAGCSqGSIb3Y2QFATCB8jAqBggrBgEFBQcCARYeaHR0cHM6Ly93d3cuYXBwbGUuY29tL2FwcGxlY2EvMIHDBggrBgEFBQcCAjCBthqBs1JlbGlhbmNlIG9uIHRoaXMgY2VydGlmaWNhdGUgYnkgYW55IHBhcnR5IGFzc3VtZXMgYWNjZXB0YW5jZSBvZiB0aGUgdGhlbiBhcHBsaWNhYmxlIHN0YW5kYXJkIHRlcm1zIGFuZCBjb25kaXRpb25zIG9mIHVzZSwgY2VydGlmaWNhdGUgcG9saWN5IGFuZCBjZXJ0aWZpY2F0aW9uIHByYWN0aWNlIHN0YXRlbWVudHMuMA0GCSqGSIb3DQEBBQUAA4IBAQBcNplMLXi37Yyb3PN3m\/J20ncwT8EfhYOFG5k9RzfyqZtAjizUsZAS2L70c5vu0mQPy3lPNNiiPvl4\/2vIB+x9OYOLUyDTOMSxv5pPCmv\/K\/xZpwUJfBdAVhEedNO3iyM7R6PVbyTi69G3cN8PReEnyvFteO3ntRcXqNx+IjXKJdXZD9Zr1KIkIxH3oayPc4FgxhtbCS+SsvhESPBgOJ4V9T0mZyCKM2r3DYLP3uujL\/lTaltkwGMzd\/c6ByxW69oPIQ7aunMZT7XZNn\/Bh1XZp5m5MkL72NVxnn6hUrcbvZNCJBIqxw8dtk2cXmPIS4AXUKqK1drk\/NAJBzewdXUhMYIByzCCAccCAQEwgaMwgZYxCzAJBgNVBAYTAlVTMRMwEQYDVQQKDApBcHBsZSBJbmMuMSwwKgYDVQQLDCNBcHBsZSBXb3JsZHdpZGUgRGV2ZWxvcGVyIFJlbGF0aW9uczFEMEIGA1UEAww7QXBwbGUgV29ybGR3aWRlIERldmVsb3BlciBSZWxhdGlvbnMgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkCCA7rV4fnngmNMAkGBSsOAwIaBQAwDQYJKoZIhvcNAQEBBQAEggEAWIQWHTimRIV1sao\/VB4lQHrW8wrVlJJsQNtpwm0isEhE720VS\/mD0jJO7wQ327owUub3Q4dEiQr2IU3FhQKYcRAX2U640VfujfHv51fM\/sW9pcsUlS3S+9bErHctkmyDzVrW2ojGpJzAv204iaut79au9WMpYO9VvFOSCOubc7MUPhDy5n8ZvOR\/CFWJZX8vfbulD+RPOg\/7FwD9XMXA21bUNj0MSkhqEeGi2kA425BhRsaByi1EanqpE2V3XA0ItXFY9irmYaSsaeay4RARLYpoZUXOQ+gLNFBp1\/B48QSuEDJnR8EWDZj\/J62fRt\/pZ0WN\/\/Vbp9ru9foYM9xnqw=="},
+		  {name: "userId", "value": ""},
+		];
+		
+		var inputRefundArrays = [
+		  {name: "outTradeNo", "value": "15430496828280"},
+		  {name: "outRefundNo", "value": "15430496828280"},
+		  {name: "channelId", "value": "179"},
+		  {name: "partnerId",  "value": "10001"},
+		  {name: "merId",  "value": "1000"},
+		  {name: "refundFee", "value": "0.01"},
+		  {name: "notifyUrl",  "value": "http://10.252.18.12:90/notify.html"},
+		  
+		  {name: "sign", "value": ""},
+		];
+		
+		var inputRefundQueryArrays = [
+		  {name: "outRefundNo", "value": "15430496828280"},
+		  {name: "channelId", "value": "85"},
+		  {name: "partnerId",  "value": "10001"},
+		  {name: "merId",  "value": "1051"},
+		  {name: "tradeId",  "value": ""},
+		  {name: "sign", "value": ""},
+		];
+
+		 //支付接口
+		function initTrade(){
+			//var pay=Pay();
+		    Pay.insertRow('tradeTable',inputTradeArrays,"tradeSign()","trade_");
+
+		}
+		function tradeSign(){
+			Pay.computerSign(inputTradeArrays,"trade_");
+		}
+
+		//查询接口
+		function initQuery(){
+		    Pay.insertRow('queryTable',inputQueryArrays,"querySign()","query_");
+
+		}
+		function querySign(){
+			Pay.computerSign(inputQueryArrays,"query_");
+		}
+
+		//iap查询接口
+		function initIAPQuery(){
+		    Pay.insertRow('queryIapTable',inputIAPQueryArrays,"queryIAPSign()","queryiap_");
+
+		}
+		function queryIAPSign(){
+			Pay.computerSign(inputIAPQueryArrays,"queryiap_");
+		}
+
+		function initRefund() {
+			Pay.insertRow('refundTable',inputRefundArrays,"refundSign()","refund_");
+		}
+		
+		function refundSign() {
+			Pay.computerSign(inputRefundArrays,"refund_");
+		}
+		
+		function initRefundQuery() {
+			Pay.insertRow('refundQueryTable',inputRefundQueryArrays,"refundQuerySign()","refundquery_");
+		}
+		
+		function refundQuerySign() {
+			Pay.computerSign(inputRefundQueryArrays,"refundquery_");
+		}
+
+		function loadJs(){
+		   initTrade(); //支付接口
+		   initQuery();//查询接口
+		   initIAPQuery();//iap查询接口
+		   initRefund(); //退款接口
+		   initRefundQuery(); //退款接口
+		}
+
+  </script>
+ </head>
+ <body  onload="loadJs()">
+ <font class="f14 tailCss">
+  <br/>此测试页面用户测试混搭支付中在线支付部分，paycenter提供的三个接口测试，此页面为内部测试页面</font>
+ <ul  class="f12">
+  <li><a href="#trade">支付接口</a></li>
+  <li><a href="#query">查询接口</a></li>
+  <li><a href="#iapquery">iap查询接口</a></li>
+ </ul>
+ 
+
+ <div class="f14 tailCss"> </div>
+ <div class="f12 l20"> </div>
+
+
+<hr>
+  <h4 id="trade">支付接口</h4>
+  <form action = urlInput method="POST" target='_blank'   id="tradeForm" >
+  <!-- <form action="https://payment70test.58v5.cn/trade" method="POST" target='_blank'   id="tradeForm" > -->
+  <table id="tradeTable">
+  </table>
+  <!-- 动态的url设置和表单提交事件的监听 -->
+ 请求网关的域名(动态化action)：<input type="url" id="url-input">
+ <script type="text/javascript">
+const form = document.querySelector('form');
+const urlInput = document.querySelector('#url-input');
+form.addEventListener('submit', (event) => {
+  event.preventDefault(); // 阻止表单默认的提交行为
+  const url = urlInput.value;
+  form.action = url;
+  form.submit(); // 提交表单，跳转到指定的 URL
+});
+  </script>
+ </form>
+
+<hr>
+  <h4 id="query">查询接口</h4>
+  <form action="http://payment.58v5.cn:8080/querynew" method="POST" target='_blank'   id="queryForm" >
+  <table id="queryTable">
+  </table>
+   请求网关的域名(动态化action)：<input type="url" id="url-input">
+ <script type="text/javascript">
+const form = document.querySelector('form');
+const urlInput = document.querySelector('#url-input');
+form.addEventListener('submit', (event) => {
+  event.preventDefault(); // 阻止表单默认的提交行为
+  const url = urlInput.value;
+  form.action = url;
+  form.submit(); // 提交表单，跳转到指定的 URL
+});
+  </script>
+ </form>
+<hr>
+  <h4 id="iapquery">iap查询接口</h4>
+  <form action="http://gateway.58.com/queryiap" method="POST" target='_blank'   id="queryIapForm" >
+  <table id="queryIapTable">
+  </table>
+   请求网关的域名(动态化action)：<input type="url" id="url-input">
+ <script type="text/javascript">
+const form = document.querySelector('form');
+const urlInput = document.querySelector('#url-input');
+form.addEventListener('submit', (event) => {
+  event.preventDefault(); // 阻止表单默认的提交行为
+  const url = urlInput.value;
+  form.action = url;
+  form.submit(); // 提交表单，跳转到指定的 URL
+});
+  </script>
+ </form>
+<hr>
+  <h4 id="refund">退款接口</h4>
+  <!--<form action="http://payment.58v5.cn:8089/refund" method="POST" target='_blank'   id="tradeForm" >-->
+  <!--<form action="http://payment157test.58v5.cn/refund  http://payment53test.58v5.cn/refund" method="POST" target='_blank'   id="refundForm" > -->
+  <!-- <form action="http://localhost:8089/refund" method="POST" target='_blank'   id="refundForm" > -->
+    <form action="http://payment157test.58v5.cn/refund" method="POST" target='_blank'   id="refundForm" >
+  <table id="refundTable">
+  </table>
+   请求网关的域名(动态化action)：<input type="url" id="url-input">
+ <script type="text/javascript">
+const form = document.querySelector('form');
+const urlInput = document.querySelector('#url-input');
+form.addEventListener('submit', (event) => {
+  event.preventDefault(); // 阻止表单默认的提交行为
+  const url = urlInput.value;
+  form.action = url;
+  form.submit(); // 提交表单，跳转到指定的 URL
+});
+  </script>
+  </form>
+<hr>
+  <h4 id="refundquery">退款查询接口</h4>
+  <!--<form action="http://payment53test.58v5.cn/refundquery" method="POST" target='_blank'   id="tradeForm" >-->
+  <!--<form action="http://payment157test.58v5.cn/refund" method="POST" target='_blank'   id="refundForm" > -->
+  <form action="http://payment157test.58v5.cn/refundquery" method="POST" target='_blank'   id="refundQueryForm" >
+  <table id="refundQueryTable">
+  </table>
+ 请求网关的域名(动态化action)：<input type="url" id="url-input">
+ <script type="text/javascript">
+const form = document.querySelector('form');
+const urlInput = document.querySelector('#url-input');
+form.addEventListener('submit', (event) => {
+  event.preventDefault(); // 阻止表单默认的提交行为
+  const url = urlInput.value;
+  form.action = url;
+  form.submit(); // 提交表单，跳转到指定的 URL
+});
+  </script>
+ </form>
+
+
+</body>
+ <script language="javascript">
+
+   function addZero(money){
+		var money_=money;
+		if(checkNumberInteger(money)){
+			money_=money+'.00';
+		}else if(checkNumberPointerOne(money)){
+			money_=money+'0';
+		}
+		return money_;
+	}
+
+	function checkNumberInteger(money){
+
+		var re = /^[1-9]{1}([0-9]*)$/; // 注意g将全文匹配，不加将永远只返回第一个匹配。
+		var arr;
+		while((arr = re.exec(money)) !=null){
+			return true;
+		}
+		return false;
+	}
+
+	function checkNumberPointerOne(money){
+		var re = /^[1-9]*([0-9]*)(.{1}[0-9]{1})$/; // 注意g将全文匹配，不加将永远只返回第一个匹配。
+		var arr;
+		while((arr = re.exec(money)) !=null){
+			return true;
+		}
+		return false;
+	}
+	// 设置表单提交的域名地址
+	function setActionUrl(){
+		const form = document.querySelector('form');
+		const urlInput = document.querySelector('#url-input');
+		const url = urlInput.value;
+		return url
+
+	}
+ </script>
+
+
+
+ <script  language="javascript">
+ var hexcase=0;function hex_md5(a){ if(a=="") return a; return rstr2hex(rstr_md5(str2rstr_utf8(a)))}function hex_hmac_md5(a,b){return rstr2hex(rstr_hmac_md5(str2rstr_utf8(a),str2rstr_utf8(b)))}function md5_vm_test(){return hex_md5("abc").toLowerCase()=="900150983cd24fb0d6963f7d28e17f72"}function rstr_md5(a){return binl2rstr(binl_md5(rstr2binl(a),a.length*8))}function rstr_hmac_md5(c,f){var e=rstr2binl(c);if(e.length>16){e=binl_md5(e,c.length*8)}var a=Array(16),d=Array(16);for(var b=0;b<16;b++){a[b]=e[b]^909522486;d[b]=e[b]^1549556828}var g=binl_md5(a.concat(rstr2binl(f)),512+f.length*8);return binl2rstr(binl_md5(d.concat(g),512+128))}function rstr2hex(c){try{hexcase}catch(g){hexcase=0}var f=hexcase?"0123456789ABCDEF":"0123456789abcdef";var b="";var a;for(var d=0;d<c.length;d++){a=c.charCodeAt(d);b+=f.charAt((a>>>4)&15)+f.charAt(a&15)}return b}function str2rstr_utf8(c){var b="";var d=-1;var a,e;while(++d<c.length){a=c.charCodeAt(d);e=d+1<c.length?c.charCodeAt(d+1):0;if(55296<=a&&a<=56319&&56320<=e&&e<=57343){a=65536+((a&1023)<<10)+(e&1023);d++}if(a<=127){b+=String.fromCharCode(a)}else{if(a<=2047){b+=String.fromCharCode(192|((a>>>6)&31),128|(a&63))}else{if(a<=65535){b+=String.fromCharCode(224|((a>>>12)&15),128|((a>>>6)&63),128|(a&63))}else{if(a<=2097151){b+=String.fromCharCode(240|((a>>>18)&7),128|((a>>>12)&63),128|((a>>>6)&63),128|(a&63))}}}}}return b}function rstr2binl(b){var a=Array(b.length>>2);for(var c=0;c<a.length;c++){a[c]=0}for(var c=0;c<b.length*8;c+=8){a[c>>5]|=(b.charCodeAt(c/8)&255)<<(c%32)}return a}function binl2rstr(b){var a="";for(var c=0;c<b.length*32;c+=8){a+=String.fromCharCode((b[c>>5]>>>(c%32))&255)}return a}function binl_md5(p,k){p[k>>5]|=128<<((k)%32);p[(((k+64)>>>9)<<4)+14]=k;var o=1732584193;var n=-271733879;var m=-1732584194;var l=271733878;for(var g=0;g<p.length;g+=16){var j=o;var h=n;var f=m;var e=l;o=md5_ff(o,n,m,l,p[g+0],7,-680876936);l=md5_ff(l,o,n,m,p[g+1],12,-389564586);m=md5_ff(m,l,o,n,p[g+2],17,606105819);n=md5_ff(n,m,l,o,p[g+3],22,-1044525330);o=md5_ff(o,n,m,l,p[g+4],7,-176418897);l=md5_ff(l,o,n,m,p[g+5],12,1200080426);m=md5_ff(m,l,o,n,p[g+6],17,-1473231341);n=md5_ff(n,m,l,o,p[g+7],22,-45705983);o=md5_ff(o,n,m,l,p[g+8],7,1770035416);l=md5_ff(l,o,n,m,p[g+9],12,-1958414417);m=md5_ff(m,l,o,n,p[g+10],17,-42063);n=md5_ff(n,m,l,o,p[g+11],22,-1990404162);o=md5_ff(o,n,m,l,p[g+12],7,1804603682);l=md5_ff(l,o,n,m,p[g+13],12,-40341101);m=md5_ff(m,l,o,n,p[g+14],17,-1502002290);n=md5_ff(n,m,l,o,p[g+15],22,1236535329);o=md5_gg(o,n,m,l,p[g+1],5,-165796510);l=md5_gg(l,o,n,m,p[g+6],9,-1069501632);m=md5_gg(m,l,o,n,p[g+11],14,643717713);n=md5_gg(n,m,l,o,p[g+0],20,-373897302);o=md5_gg(o,n,m,l,p[g+5],5,-701558691);l=md5_gg(l,o,n,m,p[g+10],9,38016083);m=md5_gg(m,l,o,n,p[g+15],14,-660478335);n=md5_gg(n,m,l,o,p[g+4],20,-405537848);o=md5_gg(o,n,m,l,p[g+9],5,568446438);l=md5_gg(l,o,n,m,p[g+14],9,-1019803690);m=md5_gg(m,l,o,n,p[g+3],14,-187363961);n=md5_gg(n,m,l,o,p[g+8],20,1163531501);o=md5_gg(o,n,m,l,p[g+13],5,-1444681467);l=md5_gg(l,o,n,m,p[g+2],9,-51403784);m=md5_gg(m,l,o,n,p[g+7],14,1735328473);n=md5_gg(n,m,l,o,p[g+12],20,-1926607734);o=md5_hh(o,n,m,l,p[g+5],4,-378558);l=md5_hh(l,o,n,m,p[g+8],11,-2022574463);m=md5_hh(m,l,o,n,p[g+11],16,1839030562);n=md5_hh(n,m,l,o,p[g+14],23,-35309556);o=md5_hh(o,n,m,l,p[g+1],4,-1530992060);l=md5_hh(l,o,n,m,p[g+4],11,1272893353);m=md5_hh(m,l,o,n,p[g+7],16,-155497632);n=md5_hh(n,m,l,o,p[g+10],23,-1094730640);o=md5_hh(o,n,m,l,p[g+13],4,681279174);l=md5_hh(l,o,n,m,p[g+0],11,-358537222);m=md5_hh(m,l,o,n,p[g+3],16,-722521979);n=md5_hh(n,m,l,o,p[g+6],23,76029189);o=md5_hh(o,n,m,l,p[g+9],4,-640364487);l=md5_hh(l,o,n,m,p[g+12],11,-421815835);m=md5_hh(m,l,o,n,p[g+15],16,530742520);n=md5_hh(n,m,l,o,p[g+2],23,-995338651);o=md5_ii(o,n,m,l,p[g+0],6,-198630844);l=md5_ii(l,o,n,m,p[g+7],10,1126891415);m=md5_ii(m,l,o,n,p[g+14],15,-1416354905);n=md5_ii(n,m,l,o,p[g+5],21,-57434055);o=md5_ii(o,n,m,l,p[g+12],6,1700485571);l=md5_ii(l,o,n,m,p[g+3],10,-1894986606);m=md5_ii(m,l,o,n,p[g+10],15,-1051523);n=md5_ii(n,m,l,o,p[g+1],21,-2054922799);o=md5_ii(o,n,m,l,p[g+8],6,1873313359);l=md5_ii(l,o,n,m,p[g+15],10,-30611744);m=md5_ii(m,l,o,n,p[g+6],15,-1560198380);n=md5_ii(n,m,l,o,p[g+13],21,1309151649);o=md5_ii(o,n,m,l,p[g+4],6,-145523070);l=md5_ii(l,o,n,m,p[g+11],10,-1120210379);m=md5_ii(m,l,o,n,p[g+2],15,718787259);n=md5_ii(n,m,l,o,p[g+9],21,-343485551);o=safe_add(o,j);n=safe_add(n,h);m=safe_add(m,f);l=safe_add(l,e)}return Array(o,n,m,l)}function md5_cmn(h,e,d,c,g,f){return safe_add(bit_rol(safe_add(safe_add(e,h),safe_add(c,f)),g),d)}function md5_ff(g,f,k,j,e,i,h){return md5_cmn((f&k)|((~f)&j),g,f,e,i,h)}function md5_gg(g,f,k,j,e,i,h){return md5_cmn((f&j)|(k&(~j)),g,f,e,i,h)}function md5_hh(g,f,k,j,e,i,h){return md5_cmn(f^k^j,g,f,e,i,h)}function md5_ii(g,f,k,j,e,i,h){return md5_cmn(k^(f|(~j)),g,f,e,i,h)}function safe_add(a,d){var c=(a&65535)+(d&65535);var b=(a>>16)+(d>>16)+(c>>16);return(b<<16)|(c&65535)}function bit_rol(a,b){return(a<<b)|(a>>>(32-b))};
+ </script>
+  <script  language="javascript">
+ // 对Date的扩展，将 Date 转化为指定格式的String
+// 月(M)、日(d)、小时(h)、分(m)、秒(s)、季度(q) 可以用 1-2 个占位符，
+// 年(y)可以用 1-4 个占位符，毫秒(S)只能用 1 个占位符(是 1-3 位的数字)
+// 例子：
+// (new Date()).Format("yyyy-MM-dd hh:mm:ss.S") ==> 2006-07-02 08:09:04.423
+// (new Date()).Format("yyyy-M-d h:m:s.S")      ==> 2006-7-2 8:9:4.18
+Date.prototype.Format = function(fmt)
+{ //author: meizz
+  var o = {
+    "M+" : this.getMonth()+1,                 //月份
+    "d+" : this.getDate(),                    //日
+    "h+" : this.getHours(),                   //小时
+    "m+" : this.getMinutes(),                 //分
+    "s+" : this.getSeconds(),                 //秒
+    "q+" : Math.floor((this.getMonth()+3)/3), //季度
+    "S"  : this.getMilliseconds()             //毫秒
+  };
+  if(/(y+)/.test(fmt))
+    fmt=fmt.replace(RegExp.$1, (this.getFullYear()+"").substr(4 - RegExp.$1.length));
+  for(var k in o)
+    if(new RegExp("("+ k +")").test(fmt))
+  fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
+  return fmt;
+}
+
+</script>
+
+
+</html>
