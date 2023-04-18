@@ -1,0 +1,78 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+   <title>测试paycenter的提供给业务的充值即冻结接口</title> 
+  <style type="text/css">
+	input{
+		width:460px;
+	} 
+  </style>
+ 
+  
+    <style type="text/css">
+        table
+        {
+            border-collapse: collapse;
+            margin: 0 auto;
+            text-align: center;
+        }
+        table td, table th
+        {
+            border: 1px solid #cad9ea;
+            color: #666;
+            height: 30px;
+			width:25%;
+        }
+        table thead th
+        {
+            background-color: #CCE8EB;
+            width: 100px;
+        }
+        table tr:nth-child(odd)
+        {
+            background: #fff;
+        }
+        table tr:nth-child(even)
+        {
+            background: #F5FAFA;
+        } 
+    </style>
+ </head>
+<body> 
+   <form action="http://paycenter.58.com/wap/frozepay" method="GET" target='_blank'    id="balanceRechargeForm" >
+     <table  class="table" width="90%"><caption><h2>充值即冻结/wap/frozepay充值测试DEMO</h2><h5>    </h5></caption>
+    
+    <tr> <td> 充值订单号</td><td><input type="text" name="orderId" id="orderId" value="blueTest1"></td></tr>
+   
+    <tr> <td> 充值用户id</td><td><input type="text" name="out_user" id="out_user" value="64712292017423"></td></tr>
+    <tr> <td> 余额类型</td><td><input type="text" name="transType" value="1"> </td></tr>
+
+    <tr> <td> 充值金额</td><td><input type="text" name="orderMoney" id="orderMoney" value="0.01"></td></tr>
+    
+    <tr> <td> 商品名称</td><td><input type="text" name="productName" value="测试数据"></td></tr>
+     <tr> <td> 商品描述</td><td><input type="text" name="productDesc" value="测试数据"></td></tr> 
+    
+    <tr> <td> url地址</td><td><input type="text" name="returnUrl" id="returnUrl"value="http://paycenter.58.com"></td></tr>
+    <tr> <td> 通知地址</td><td><input type="text" name="notifyUrl" id="notifyUrl" value="http://paycenter.58.com"></td></tr>
+
+    <tr> <td> 商户ID</td><td><input type="text" name="merId" id="merId" value="1294"> </td></tr>
+    <tr> <td> 金额只读</td><td><input type="text" name="moneyread" id="moneyread" value="1"></td></tr>
+  
+    <tr><td colspan="2"><input type="submit" name="submsts" value="提交测试"></td></tr>
+     </table> 
+  </form>  
+  
+  
+ 
+	<table  class="table" width="90%">
+		<caption><h2>merId接入情况说明</h2></caption>
+	 <thead><th>品牌</th><th>merId</th><th>账户类型</th><th>备注</th></thead>
+	 <tr><td>1294</td><td>58</td><td>0：58交易宝</td><td> </td></tr>
+	 <tr><td>1132</td><td>58</td><td>0：58交易宝</td><td></td></tr>
+	 <tr><td>21003</td><td>58房产</td><td>60：房产交易宝</td><td>白名单merid，支持业务传递0 </td></tr>
+	 <tr><td>21006</td><td>58房产</td><td>60：房产交易宝</td><td></td></tr> 
+	 <tr><td>21007</td><td>58房产</td><td>50：房产现金</td><td></td></tr>
+	</table>
+</body>
+
+</html>

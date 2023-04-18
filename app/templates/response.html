@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+
+<script>
+    function login(){
+        var merkey = null
+        $.ajax({
+            async:false,
+            url:"http://127.0.0.1:20000/admin/getBankTransferRecordResponse",
+            type:"get",
+            {#dataType:"json",#}
+            {#//data为要传递给后端的数据，使用JSON.stringify()转换为json格式#}
+            {#data:JSON.stringify({#}
+            {#        userId:   $("#userId").val(),#}
+            {#        merId: $("#merId").val()#}
+            {#    }),#}
+            success:function (data){
+                {#alert("登录成功")#}
+                console.log(data)
+                {#console.log(data.status)#}
+                {#console.log(data.time)#}
+                console.log(data.merkey)
+                merkey = data.merkey
+            },
+            error:function (){
+                alert("获取merkey失败")
+                console.log("***********")
+            },
+        });
+        console.log(merkey)
+        return merkey
+    }
+</script>
+<body>
+
+</body>
+</html>

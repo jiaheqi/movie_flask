@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title></title>
+        <script type="text/javascript">
+        //1.创建数据库(数据库名，版本，描述信息，大小)
+        var db=openDatabase('mybd','1.0','text db','1024*1024');
+        //2.创建数据表：
+        //create table if not exists userinf(id unique,name)
+        //创建表       表            如果不存在                             表名：userinf（两个字段名 id（主键），name）
+        db.transaction(function(contex){
+            contex.executeSql('create table if not exists userinf(id unique,name)');
+        });
+
+        //3.给数据库添加数据
+
+        db.transaction(function(contex){
+            contex.executeSql('insert into userinf(id,name) values(0,"malin")');
+        });
+        db.transaction(function(contex){
+            contex.executeSql('insert into userinf(id,name) values(1,"malin2")');
+        });
+        db.transaction(function(contex){
+            contex.executeSql('insert into userinf(id,name) values(2,"malin3")');
+        });
+        db.transaction(function(contex){
+            contex.executeSql('insert into userinf(id,name) values(3,"malin4")');
+        });
+
+        //4.查询数据
+
+        db.transaction(function(contex){
+            contex.executeSql('select * from userinf',[],function(con,data){
+                //console.log(data);
+                var rows=data.rows.length,i;
+                console.log('总共行数是：'+rows);
+                for(var i=0;i<rows;i++){
+                    console.log(data.rows.item(i).id+':'+data.rows.item(i).name);
+                }
+            });
+        });
+
+        //5.删除数据
+        db.transaction(function(contex){
+            contex.executeSql('delete from userinf where name="malin"');
+        });
+
+        //6.改数据
+
+        db.transaction(function(contex){
+            contex.executeSql('update userinf set name="popo" where id=1');
+        });
+
+        //7.删除整个表
+        db.transaction(function(contex){
+            contex.executeSql('drop table userinf');
+        });
+
+        </script>
+    </head>
+    <body>
+    </body>
+</html>

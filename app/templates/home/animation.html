@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>热映电影</title>
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='anim/css/style.css') }}">
+</head>
+<body>
+<!--轮播图 开始 -->
+<div class="main_banner">
+	<div class="main_banner_wrap">
+		<canvas id="myCanvas" width="150" height="150"></canvas>
+		<div class="main_banner_box" id="m_box">
+			<a href="javascript:void(0)" class="banner_btn js_pre">
+				<span class="banner_btn_arrow"><i></i></span>
+			</a>
+			<a href="javascript:void(0)" class="banner_btn btn_next js_next">
+				<span class="banner_btn_arrow"><i></i></span>
+			</a>
+			<ul>
+				<li id="imgCard0">
+					<a href=""><span style="opacity:0;"></span></a>
+					<img src="{{ url_for('static',filename='uploads/201801311223136151bb94fe9c4d638e0862caee70ad04.jpg') }}" alt="">
+					<p style="bottom:0">木乃伊</p>
+				</li>
+				<li id="imgCard1">
+					<a href=""><span style="opacity:0.4;"></span></a>
+					<img src="{{ url_for('static',filename='uploads/201802011408079d15a36b7fe544ed8b475c350de9819c.jpg') }}" alt="">
+					<p>变形金刚</p>
+				</li>
+				<li id="imgCard2">
+					<a href=""><span style="opacity:0.4;" ></span></a>
+					<img src="{{ url_for('static',filename='uploads/2018020115165833e2d5e08f8240f4b09bdc0321c4b2f7.jpg') }}" alt="">
+					<p>芳华2</p>
+				</li>
+				<li id="imgCard3">
+					<a href=""><span style="opacity:0.4;"></span></a>
+					<img src="{{ url_for('static',filename='uploads/2018020912153671c61fc72a6b48468b258dfbe060ea0d.jpg') }}" alt="">
+					<p>廊坊阿卡</p>
+				</li>
+				<li id="imgCard4">
+					<a href=""><span style="opacity:0.4;"></span></a>
+					<img src="{{ url_for('static',filename='uploads/2018013111161699e45aee62e54da2abbca15a59aa3e20.png') }}" alt="">
+					<p>南京站</p>
+				</li>
+			</ul>
+			<!--火狐倒影图层-->
+			<p id="rflt"></p>
+			<!--火狐倒影图层-->
+		</div>
+		<!--序列号按钮-->
+		<div class="btn_list">
+			<span class="curr"></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+
+
+		</div>
+	</div>
+
+</div>
+<!--轮播图 结束 -->
+
+<script type="text/javascript" src="{{ url_for('static',filename='anim/js/jquery.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static',filename='anim/js/script.js') }}"></script>
+
+</body>
+</html>

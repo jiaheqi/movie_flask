@@ -1,0 +1,535 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="Author" content="">
+  <meta name="Keywords" content="">
+  <meta name="Description" content="">
+  <title>测试环境-测试paycenter的提供给业务部的充值，支付接口</title>
+  <style type="text/css">
+	input{
+		width:260px;
+	}
+	.show{
+		display:block;
+	}
+	.hide{
+		display:none;
+	}
+  </style>
+  <script type="text/javascript">
+		function changeForm(formName){
+			
+			var className=document.getElementById(formName).className;
+			if(className=="hide"){
+				document.getElementById(formName).className="show";
+			}else{
+				document.getElementById(formName).className="hide";
+			}
+		}
+  </script>
+ </head>
+
+ <body>
+ 
+ 	<br/>
+ 	
+ 	  <a href="http://paycenter.58.com/checkBrowser"  >验证浏览器</a>
+ 	
+ 	<br/>
+ 	
+ 	
+	<br/><b>3.1余额充值老接口</b>ok<a href="javascript:void(0)" onClick="changeForm('balanceRechargeForm')">打开</a><br/>
+	  
+  <form action="http://paycenter.58.com/balanceRecharge" method="POST" target='_blank' class="show"    id="balanceRechargeForm" >
+   支付通道：<input type="text" name="channelId" id="balanceRecharge_channelId" value="33">((85:微信;52：支付宝 ，不传递时为全部方式)<br/>
+   支付扫码：<input type="text" name="hasCoupon" id="balanceRecharge_hasCoupon" value="1"><br/>
+   充值订单号：<input type="text" name="orderId" id="balanceRecharge_orderId" value="lxltest1101"><br/>
+   充值用户id：<input type="text" name="buyAccountId" id="balanceRecharge_buyAccountId" value="64712292017423">
+   
+      金额只读moneyRead：<input type="text" name="moneyRead" id="balanceRecharge_moneyRead" value="1"><br/>
+   
+   余额类型：<input type="text" name="accountType" value="1"> 
+   **:当前登录用户id,否则不能支付<br/>
+   充值金额：<input type="text" name="orderMoney" id="balanceRecharge_orderMoney" value="0.01"><br/>
+   商品名称：<input type="text" name="productName" value="测试数据"><br/>
+    商品描述：<input type="text" name="productDesc" value="测试数据"><br/>
+   商品展示地址：<input type="text" name="productUrl" value="http://paycenter.58.com"><br/>
+   url地址：<input type="text" name="returnUrl" id="balanceRecharge_returnUrl"value="http://paycenter.58.com"><br/>
+   通知地址：<input type="text" name="notifyUrl" id="balanceRecharge_notifyUrl" value="http://paycenter.58.com"><br/>
+   商户ID：<input type="text" name="merId" id="balanceRecharge_merId" value="1001"> <font color='red'>
+   **:可用 ：1001（团购）  1022（制定系统），1003(代理商)，（vip） 1047 ；1075  </font><br/>
+   校验码：<input type="text" name="sign" id="balanceRecharge_sign" value="syh">
+     校验码：<input type="text" name="signstr" id="balanceRecharge_signstr" value="syh">
+   <a href="javascript:void(0)" onClick="getBalanceRechargeSign()">计算sign</a>
+   商户 ID+充值用户 ID+业务订单号+充值金额+支付通道+商户 key 通过 MD5 加密后的数据
+   <br/>
+   <input type="submit" name="submsts" value="提交测试">
+   <br/><font color='red'>**:查看购买用户id,可到my.58.com里查看源代码，然后搜索userid，拿到里面的数字就行了</font><br/>
+  </form>  
+	 <!--
+	 联盟推广，get方式提交
+	 
+	 1022 置顶 ；1126 精准 ；7202 智能
+	 paycenter.58.com/balanceRecharge?buyAccountId=5185173207809&merId=1022&sign=60dfd5f07e2a294ac8dc6d06ea0becaa&channelId=33&orderMoney=0.01&productName=??cpt??&productDesc=??????&hasCoupon=1&accountType=2&returnUrl=http://jingzhun.58.com/simply/chargeReturnCpt?resultPara=16202694965505|5185173207809|1133418,1133420,14854665|2.00,2.00,2.00|0,1
+	 	 
+	 -->	
+	 
+
+/check  查询(同步)充值结果(其它业务系统查询) <br/> 
+
+http://paycenter.58.com/check
+ 
+/querycharge 查询(同步)支付结果(支付系统使用) <br/>
+ <a href="http://paycenter.58.com/querycharge?payid=156211765359676804&accounttype=2" target="_blank">同步推广余额wx</a>
+//select * from orders where id='156233948060454276'
+<a href="http://paycenter.58.com/querycharge?payid=156233948060454276&accounttype=2" target="_blank">同步推广余额</a>
+//156211765359676804 
+ 
+ 1、推广余额充值，58余额充值，统一收银台充值加支付
+2、财务后台调用的订单查询
+3、退款
+4、退款明细查询
+
+<br/> 
+
+
+ </body>
+ 
+ <script language="javascript"> 
+
+
+ /**
+			置顶系统：1022  置顶系统 127d8eba89149a7aa241eea19d8fcfee
+					1095 订单—高级置顶 0ed16385f40fe7085857e15ed188e163 
+			团购：1001：338f72f868ba82a37cdb95166cf1fcf3；1057（团购自助结） f197f022ca6e2b15cc068f5ad70f4c39
+			充值：
+			代理商：1003 53225ce52283422a83723508614b2f22 
+			vip：1047  VIP网邻通刷新  7bb4d5f1f87ae0a2e66ebb5a2a107ece；
+			     1075 VIP在线充返测试 0708cee53ac500be4e7025f90e3cc4ac
+			338f72f868ba82a37cdb95166cf1fcf3
+			
+			
+			338f72f868ba82a37cdb95166cf1fcf3
+		 */
+     var merKey="338f72f868ba82a37cdb95166cf1fcf3";//在pay中的merInfo表中，置顶，团购，单充值，代理商充值，vip充值
+	             
+	 /**创建订单的下单并支付接口*/
+	 function getPaySign(){
+		 var buyAccountId=document.getElementById("buyAccountId").value;
+		 var merId=document.getElementById("merId").value;
+		 var orderId=document.getElementById("orderId").value;
+		 var orderMoney=document.getElementById("orderMoney").value;
+		 var validPayTime=document.getElementById("validPayTime").value;
+		 var limitPayType = document.getElementById("limitPayType").value;
+		 var sign="merId="+merId+"&buyAccountId="+buyAccountId+"&orderId="+orderId
+		 +"&orderMoney="+orderMoney;
+		 if(validPayTime!=''){
+		 	  sign+="&validPayTime="+validPayTime;
+		 }
+		 
+		 
+		 		 		  if(merId=='1206'){//1
+			merKey='f3b66350cda18f67ac0a787a9eb9afdd';
+		 }
+		 if(merId=='1130'){//0
+			merKey='03cc8094963bd4dc03099dc4f8e81229';
+		 }
+		 if(merId=='28001'){//53
+			merKey='088c156e1f17c1d8f06faca3b234255a';
+		 }
+		 if(merId=='28002'){//61
+			merKey='3c988e53633e1a7f672f0fe4ff512cd0';
+		 }
+		 if(merId=='28003'){//6
+			merKey='43dcbcd012b00e4e82a54fad56dc27b4';
+		 }
+		 		 if(merId=='1032'){//白名单现金1
+			merKey='8ebc7b76737c377bc42aeb40bd36efe8';
+		 }
+		 if(merId=='1132'){//白名单交易宝0
+			merKey='e9e27130850f58d43d8063acddf58231';
+		 }		 
+		 
+		 
+		 if(merId=='1091'){
+		  	merKey='501a41ae75324d7363af72945823b8f2';//1091 招聘精准CPC  推广余额
+		 }
+		 if(merId=='1093'){ 
+		   	merKey='8cf372da019da31d1a956d94eed2b64d';//1093 400电话  58余额
+		 }
+		 if(merId=='1001'){ 
+		   	merKey='338f72f868ba82a37cdb95166cf1fcf3';//1001  团购，交易宝
+		 }
+		 if(merId=='1018'){
+			merKey='127d8eba89149a7aa241eea19d8fcfee';//招聘网邻通竞价  58余额
+		 }
+		 if(merId=='1104'){
+			merKey='bf75e27f8a8222a17c5638430c2605a8';//bf75e27f8a8222a17c5638430c2605a8  正式// 88ed1df188787084d54bcffc001f6826  测试环境
+		 }
+		 if(merId=='1052'){
+		 		merKey='b00fb744f9f5d3f952ad0fc03f62114d';
+		 	}
+		if(merId=='1044'){
+		 	merKey='c24389032902ecae731ea7a7ac362aa9';
+		}
+		 if(merId=='1034'){//58呼转  58余额
+			merKey='0d43a543566f6246d30750a9c59ebc69';
+		 }
+		 if(merId=='1051'){//58余额
+			merKey='3fe8d563958659428dbec9911e453ba0';
+		 }
+		 if(merId=='1022'){//推广余额
+			merKey='127d8eba89149a7aa241eea19d8fcfee';
+		 }
+		  if(merId=='1169'){//推广余额
+			merKey='99f723fcf89dde5102ca445ef1f17c83';
+		 }
+		 var starttime=document.getElementById("starttime").value;
+		 var endtime=document.getElementById("endtime").value;
+		 if(merId=='1206'||merId=='1130'||merId=='28001'||merId=='28002'||merId=='21007'||merId=='2263'||merId=='1032'||merId=='1132'){
+		     sign+="&starttime="+starttime;
+		 }
+		 if(merId=='1206'||merId=='1130'||merId=='28001'||merId=='28002'||merId=='21007'||merId=='2263'||merId=='1032'||merId=='1132'){
+		    sign+="&endtime="+endtime;
+		 } 
+		 if(merId=='32001'){//宠物网邻通竞价
+			merKey='a62a7951c1df8f8f546cdeed33ae84e0';
+		 }
+		 
+		  if(merId=='32009'){//黄页
+			merKey='bed53c689625414f76818d068d1741d7';
+		 }
+		   
+	
+		 if(merId=='32006'){//房产limeng
+			merKey='88a04f1a4cece7a8707cfe550155a44f';
+		 }
+		  if(merId=='32007'){//二手limeng
+			merKey='446929ad0fe15120be5c68dade86206c';
+		 }
+		  if(merId=='32003'){//58汽车推广币测试
+			merKey='e94a3a523c7a2b68418ae05d00cfd2cf';
+		 }
+		  if(merId=='1150'){//驾校一点通
+			merKey='d23c0fb6915982af3559a21b063b1999';
+		 }
+		 
+		 
+		 
+		 var balancepaid=document.getElementById("balancePaid").value;
+		 if(balancepaid!=''){
+			sign+="&balancePaid="+balancepaid;
+		 }
+		 if(limitPayType!=''){
+			sign+="&limitPayType="+limitPayType;
+		 }
+		 sign+=merKey;	 
+		 document.getElementById("paySign").value= hex_md5(sign);
+	 }
+   
+	function getUpdatePaySign(){
+		 var buyAccountId=document.getElementById("update_buyAccountId").value;
+		 var merId=document.getElementById("update_merId").value;
+		 var orderId=document.getElementById("update_orderId").value;
+		 var orderMoney=document.getElementById("update_orderMoney").value; 
+		 var notifyUrl=document.getElementById("update_notifyUrl").value;
+		 
+		 var sign="merId="+merId+"&buyAccountId="+buyAccountId+"&orderId="+orderId
+		 +"&orderMoney="+orderMoney+"&notifyUrl="+notifyUrl+merKey;	 
+		 document.getElementById("updatePaySign").value=hex_md5(sign);	
+	}
+	
+	function getCloseOrderSign(){
+		 var buyAccountId=document.getElementById("closeOrder_buyAccountId").value;
+		 var merId=document.getElementById("closeOrder_merId").value;
+		 var orderId=document.getElementById("closeOrder_orderId").value;
+		 
+		 var notifyUrl=document.getElementById("closeOrder_notifyUrl").value;
+		 //merKey=b00fb744f9f5d3f952ad0fc03f62114d;
+		 var sign="merId="+merId+"&buyAccountId="+buyAccountId+"&orderId="+orderId
+		 +"&notifyUrl="+notifyUrl+merKey;	 
+		 document.getElementById("closeOrder_sign").value=hex_md5(sign);	
+	}
+	
+	function getRechargeSign(){
+		 var buyAccountId=document.getElementById("recharge_buyAccountId").value;
+		 var merId=document.getElementById("recharge_merId").value;
+		 var returnUrl=document.getElementById("recharge_returnUrl").value;
+		 var channelId=document.getElementById("recharge_channelId").value;
+		 var notifyUrl=document.getElementById("recharge_notifyUrl").value;
+		 var orderMoney=document.getElementById("recharge_orderMoney").value;
+		 var orderId=document.getElementById("recharge_orderId").value;
+		 var sign=merId+buyAccountId+orderId+orderMoney+channelId+merKey;
+		//商户 ID+充值用户 ID+业务订单号+充值金额+支付通道+商户 key 通过 MD5 加密后的数据
+		 document.getElementById("recharge_sign").value=hex_md5(sign);
+	}
+	
+	function getPayDeSign(){
+		 var buyAccountId=document.getElementById("payde_buyAccountId").value;
+		 var merId=document.getElementById("payde_merId").value;
+		 var returnUrl=document.getElementById("payde_returnUrl").value;
+		 var channelId=document.getElementById("payde_channelId").value;
+		 var notifyUrl=document.getElementById("payde_notifyUrl").value;
+		 var orderMoney=document.getElementById("payde_orderMoney").value;
+		 var orderId=document.getElementById("payde_orderId").value;
+		 var sign=merId+buyAccountId+orderId+orderMoney+channelId+merKey;
+		 //商户 ID+充值用户 ID+业务订单号+充值金额+支付通道+商户 key 通过 MD5 加密后的数据
+		 document.getElementById("payde_sign").value=hex_md5(sign);
+	}
+	
+	function getToRechargeSign(){
+	    var buyAccountId=document.getElementById("payde_buyAccountId").value;
+	    var merId=document.getElementById("toRecharge_merId").value;
+	    var returnUrl=document.getElementById("toRecharge_returnUrl").value;
+	    var notifyUrl=document.getElementById("toRecharge_notifyUrl").value;
+	    var orderMoney=document.getElementById("toRecharge_orderMoney").value;
+	    var sign=buyAccountId+merId+notifyUrl+merKey;
+		 //充值用户 ID+商户 ID+异 步 通 知 地 址 + 商 户key 通过 MD5 加密
+		 document.getElementById("toRecharge_sign").value=hex_md5(sign);
+		
+	}
+	
+	function getBalanceRechargeSign(){
+		//商户ID+充值用户ID+业务订单号+充值金额+扫码渠道充值+支付通道+商户key通过MD5加密后的数据(支付通道,扫码渠道充值不为空则参与签名)
+		
+		var merId=document.getElementById("balanceRecharge_merId").value; 
+		var buyAccountId=document.getElementById("balanceRecharge_buyAccountId").value;
+		var orderId=document.getElementById("balanceRecharge_orderId").value;
+	    var orderMoney=document.getElementById("balanceRecharge_orderMoney").value;
+		var channelId=document.getElementById("balanceRecharge_channelId").value;
+		var hasCoupon=document.getElementById("balanceRecharge_hasCoupon").value;
+	    var sign=merId+buyAccountId+orderId;
+		
+		sign=sign+addZero(orderMoney);
+		
+		if(hasCoupon!=''){
+			sign=sign+hasCoupon;
+		}
+		if(channelId!=''){
+			sign=sign+channelId;
+		}
+	 if(merId=='1091'){
+		  	merKey='501a41ae75324d7363af72945823b8f2';//1091 招聘精准CPC  推广余额
+		 }
+		 if(merId=='1093'){ 
+		   	merKey='8cf372da019da31d1a956d94eed2b64d';//1093 400电话  58余额
+		 }
+		 if(merId=='1001'){ 
+		   	merKey='338f72f868ba82a37cdb95166cf1fcf3';//1001  团购，交易宝
+		 }
+		 if(merId=='1018'){
+			merKey='127d8eba89149a7aa241eea19d8fcfee';//招聘网邻通竞价  58余额
+		 }
+		 if(merId=='1104'){
+			merKey='bf75e27f8a8222a17c5638430c2605a8';//bf75e27f8a8222a17c5638430c2605a8  正式// 88ed1df188787084d54bcffc001f6826  测试环境
+		 }
+		 if(merId=='1052'){
+		 		merKey='b00fb744f9f5d3f952ad0fc03f62114d';
+		 	}
+		if(merId=='1044'){
+		 	merKey='c24389032902ecae731ea7a7ac362aa9';
+		}
+		 if(merId=='1034'){//58呼转  58余额
+			merKey='0d43a543566f6246d30750a9c59ebc69';
+		 }
+		 if(merId=='1051'){//58余额
+			merKey='3fe8d563958659428dbec9911e453ba0';
+		 }
+		 if(merId=='1022'){//推广余额
+			merKey='127d8eba89149a7aa241eea19d8fcfee';
+		 }
+		  if(merId=='1169'){//推广余额
+			merKey='99f723fcf89dde5102ca445ef1f17c83';
+		 }
+		// var starttime=document.getElementById("starttime").value;
+		//var endtime=document.getElementById("endtime").value;
+		
+		 if(merId=='32001'){//宠物网邻通竞价
+			merKey='a62a7951c1df8f8f546cdeed33ae84e0';
+		 }
+		 
+		  if(merId=='32009'){//黄页
+			merKey='bed53c689625414f76818d068d1741d7';
+		 }
+		   
+	
+		 if(merId=='32006'){//房产limeng
+			merKey='88a04f1a4cece7a8707cfe550155a44f';
+		 }
+		  if(merId=='32007'){//二手limeng
+			merKey='446929ad0fe15120be5c68dade86206c';
+		 }
+		  if(merId=='32003'){//58汽车推广币测试
+			merKey='e94a3a523c7a2b68418ae05d00cfd2cf';
+		 }
+		  if(merId=='1150'){//驾校一点通
+			merKey='d23c0fb6915982af3559a21b063b1999';
+		 }
+		 
+		  if(merId=='1110') {//交易宝
+			merKey = '4c9c2a7654585dca9918b15226880ac7';
+		 }
+		 
+		 		 		 //白名单现金
+		  if(merId=='1043'){
+			merKey='e9deb9ab4f4c335a7fb93474e5379da0';
+		 }
+		
+		//白名单交易宝
+		  if(merId=='1259'){
+			merKey='658e18225538dd37e73670d29a6aebb4';
+		 }
+		 
+		 		 //白名单房产推广币
+		  if(merId=='1587'){
+			merKey='a65e8c384b9436ebd2dd32f761c56577';
+		 }
+		 
+		 //白名单跨线merId: 1042（现金），1302（通用）
+		  if(merId=='1042'){
+			merKey='901042894a3cf15fb3f17fa48c01fa64';
+		 }
+		  if(merId=='1302'){
+			merKey='59a48ce8a67d80ff47fe277a501263b4';
+		 }
+		 
+		 		 else if(merId=='21000'){//房产现金
+			merKey='ea096cc8d499d55679882b974f84614b';
+		 }
+		 
+		 else if(merId=='21003'){//房产交易宝
+			merKey='6a096cc8d499d556798821974f84614b';
+		 }
+		 
+		 else if(merId=='21004'){//房产现金
+			merKey='7a096cc8d499d556798822974f84614b';
+		 }
+		 
+		 else if(merId=='21005'){//房产推广币
+			merKey='8a096cc8d499d556798823974f84614b';
+		 }
+		 
+		 else if(merId=='21006'){//房产交易宝
+			merKey='6a096cc8d499d556798821974f84614b';
+		 }
+		 
+		 else if(merId=='21007'){//房产现金
+			merKey='7a096cc8d499d556798822974f84614b';
+		 }
+		 
+		 else if(merId=='21008'){//房产推广币
+			merKey='8a096cc8d499d556798823974f84614b';
+		 }
+		 
+		 
+		sign=sign+merKey;
+	 	document.getElementById("balanceRecharge_signstr").value=sign;
+		//document.writeln(sign);
+		document.getElementById("balanceRecharge_sign").value=hex_md5(sign);
+		
+	}
+	function getBalanceRechargeSignWB(){
+		//商户ID+充值用户ID+业务订单号+充值金额+扫码渠道充值+支付通道+商户key通过MD5加密后的数据(支付通道,扫码渠道充值不为空则参与签名)
+		
+		var merId=document.getElementById("balanceRecharge_merId").value; 
+		var buyAccountId=document.getElementById("balanceRecharge_buyAccountId").value;
+		var orderId=document.getElementById("balanceRecharge_orderId").value;
+	    var orderMoney=document.getElementById("balanceRecharge_orderMoney").value;
+		var channelId=document.getElementById("balanceRecharge_channelId").value;
+		var hasCoupon=document.getElementById("balanceRecharge_hasCoupon").value;
+	    var sign=merId+buyAccountId+orderId;
+		
+		sign=sign+addZero(orderMoney);
+		
+		if(hasCoupon!=''){
+			sign=sign+hasCoupon;
+		}
+		if(channelId!=''){
+			sign=sign+channelId;
+		}
+		merKey="127d8eba89149a7aa241eea19d8fcfee";
+		sign=sign+merKey;
+
+	 	document.getElementById("balanceRecharge_signstr_wb").value=sign;
+		//document.writeln(sign);
+		document.getElementById("balanceRecharge_sign_wb").value=hex_md5(sign);
+		
+	}
+	function addZero(money){
+		var money_=money;
+		if(checkNumberInteger(money)){
+			money_=money+'.00';
+		}else if(checkNumberPointerOne(money)){
+			money_=money+'0';
+		}
+		return money_;
+	}
+	
+	function checkNumberInteger(money){
+	 
+		var re = /^[1-9]{1}([0-9]*)$/; // 注意g将全文匹配，不加将永远只返回第一个匹配。 
+		var arr; 
+		while((arr = re.exec(money)) !=null){  
+			return true;
+		}
+		return false;
+	}
+	
+	function checkNumberPointerOne(money){
+		var re = /^[1-9]*([0-9]*)(.{1}[0-9]{1})$/; // 注意g将全文匹配，不加将永远只返回第一个匹配。 
+		var arr; 
+		while((arr = re.exec(money)) !=null){  
+			return true;
+		}
+		return false;
+	}
+ </script>
+ 
+ 
+ 
+ <script  language="javascript">
+ var hexcase=0;function hex_md5(a){ if(a=="") return a; return rstr2hex(rstr_md5(str2rstr_utf8(a)))}function hex_hmac_md5(a,b){return rstr2hex(rstr_hmac_md5(str2rstr_utf8(a),str2rstr_utf8(b)))}function md5_vm_test(){return hex_md5("abc").toLowerCase()=="900150983cd24fb0d6963f7d28e17f72"}function rstr_md5(a){return binl2rstr(binl_md5(rstr2binl(a),a.length*8))}function rstr_hmac_md5(c,f){var e=rstr2binl(c);if(e.length>16){e=binl_md5(e,c.length*8)}var a=Array(16),d=Array(16);for(var b=0;b<16;b++){a[b]=e[b]^909522486;d[b]=e[b]^1549556828}var g=binl_md5(a.concat(rstr2binl(f)),512+f.length*8);return binl2rstr(binl_md5(d.concat(g),512+128))}function rstr2hex(c){try{hexcase}catch(g){hexcase=0}var f=hexcase?"0123456789ABCDEF":"0123456789abcdef";var b="";var a;for(var d=0;d<c.length;d++){a=c.charCodeAt(d);b+=f.charAt((a>>>4)&15)+f.charAt(a&15)}return b}function str2rstr_utf8(c){var b="";var d=-1;var a,e;while(++d<c.length){a=c.charCodeAt(d);e=d+1<c.length?c.charCodeAt(d+1):0;if(55296<=a&&a<=56319&&56320<=e&&e<=57343){a=65536+((a&1023)<<10)+(e&1023);d++}if(a<=127){b+=String.fromCharCode(a)}else{if(a<=2047){b+=String.fromCharCode(192|((a>>>6)&31),128|(a&63))}else{if(a<=65535){b+=String.fromCharCode(224|((a>>>12)&15),128|((a>>>6)&63),128|(a&63))}else{if(a<=2097151){b+=String.fromCharCode(240|((a>>>18)&7),128|((a>>>12)&63),128|((a>>>6)&63),128|(a&63))}}}}}return b}function rstr2binl(b){var a=Array(b.length>>2);for(var c=0;c<a.length;c++){a[c]=0}for(var c=0;c<b.length*8;c+=8){a[c>>5]|=(b.charCodeAt(c/8)&255)<<(c%32)}return a}function binl2rstr(b){var a="";for(var c=0;c<b.length*32;c+=8){a+=String.fromCharCode((b[c>>5]>>>(c%32))&255)}return a}function binl_md5(p,k){p[k>>5]|=128<<((k)%32);p[(((k+64)>>>9)<<4)+14]=k;var o=1732584193;var n=-271733879;var m=-1732584194;var l=271733878;for(var g=0;g<p.length;g+=16){var j=o;var h=n;var f=m;var e=l;o=md5_ff(o,n,m,l,p[g+0],7,-680876936);l=md5_ff(l,o,n,m,p[g+1],12,-389564586);m=md5_ff(m,l,o,n,p[g+2],17,606105819);n=md5_ff(n,m,l,o,p[g+3],22,-1044525330);o=md5_ff(o,n,m,l,p[g+4],7,-176418897);l=md5_ff(l,o,n,m,p[g+5],12,1200080426);m=md5_ff(m,l,o,n,p[g+6],17,-1473231341);n=md5_ff(n,m,l,o,p[g+7],22,-45705983);o=md5_ff(o,n,m,l,p[g+8],7,1770035416);l=md5_ff(l,o,n,m,p[g+9],12,-1958414417);m=md5_ff(m,l,o,n,p[g+10],17,-42063);n=md5_ff(n,m,l,o,p[g+11],22,-1990404162);o=md5_ff(o,n,m,l,p[g+12],7,1804603682);l=md5_ff(l,o,n,m,p[g+13],12,-40341101);m=md5_ff(m,l,o,n,p[g+14],17,-1502002290);n=md5_ff(n,m,l,o,p[g+15],22,1236535329);o=md5_gg(o,n,m,l,p[g+1],5,-165796510);l=md5_gg(l,o,n,m,p[g+6],9,-1069501632);m=md5_gg(m,l,o,n,p[g+11],14,643717713);n=md5_gg(n,m,l,o,p[g+0],20,-373897302);o=md5_gg(o,n,m,l,p[g+5],5,-701558691);l=md5_gg(l,o,n,m,p[g+10],9,38016083);m=md5_gg(m,l,o,n,p[g+15],14,-660478335);n=md5_gg(n,m,l,o,p[g+4],20,-405537848);o=md5_gg(o,n,m,l,p[g+9],5,568446438);l=md5_gg(l,o,n,m,p[g+14],9,-1019803690);m=md5_gg(m,l,o,n,p[g+3],14,-187363961);n=md5_gg(n,m,l,o,p[g+8],20,1163531501);o=md5_gg(o,n,m,l,p[g+13],5,-1444681467);l=md5_gg(l,o,n,m,p[g+2],9,-51403784);m=md5_gg(m,l,o,n,p[g+7],14,1735328473);n=md5_gg(n,m,l,o,p[g+12],20,-1926607734);o=md5_hh(o,n,m,l,p[g+5],4,-378558);l=md5_hh(l,o,n,m,p[g+8],11,-2022574463);m=md5_hh(m,l,o,n,p[g+11],16,1839030562);n=md5_hh(n,m,l,o,p[g+14],23,-35309556);o=md5_hh(o,n,m,l,p[g+1],4,-1530992060);l=md5_hh(l,o,n,m,p[g+4],11,1272893353);m=md5_hh(m,l,o,n,p[g+7],16,-155497632);n=md5_hh(n,m,l,o,p[g+10],23,-1094730640);o=md5_hh(o,n,m,l,p[g+13],4,681279174);l=md5_hh(l,o,n,m,p[g+0],11,-358537222);m=md5_hh(m,l,o,n,p[g+3],16,-722521979);n=md5_hh(n,m,l,o,p[g+6],23,76029189);o=md5_hh(o,n,m,l,p[g+9],4,-640364487);l=md5_hh(l,o,n,m,p[g+12],11,-421815835);m=md5_hh(m,l,o,n,p[g+15],16,530742520);n=md5_hh(n,m,l,o,p[g+2],23,-995338651);o=md5_ii(o,n,m,l,p[g+0],6,-198630844);l=md5_ii(l,o,n,m,p[g+7],10,1126891415);m=md5_ii(m,l,o,n,p[g+14],15,-1416354905);n=md5_ii(n,m,l,o,p[g+5],21,-57434055);o=md5_ii(o,n,m,l,p[g+12],6,1700485571);l=md5_ii(l,o,n,m,p[g+3],10,-1894986606);m=md5_ii(m,l,o,n,p[g+10],15,-1051523);n=md5_ii(n,m,l,o,p[g+1],21,-2054922799);o=md5_ii(o,n,m,l,p[g+8],6,1873313359);l=md5_ii(l,o,n,m,p[g+15],10,-30611744);m=md5_ii(m,l,o,n,p[g+6],15,-1560198380);n=md5_ii(n,m,l,o,p[g+13],21,1309151649);o=md5_ii(o,n,m,l,p[g+4],6,-145523070);l=md5_ii(l,o,n,m,p[g+11],10,-1120210379);m=md5_ii(m,l,o,n,p[g+2],15,718787259);n=md5_ii(n,m,l,o,p[g+9],21,-343485551);o=safe_add(o,j);n=safe_add(n,h);m=safe_add(m,f);l=safe_add(l,e)}return Array(o,n,m,l)}function md5_cmn(h,e,d,c,g,f){return safe_add(bit_rol(safe_add(safe_add(e,h),safe_add(c,f)),g),d)}function md5_ff(g,f,k,j,e,i,h){return md5_cmn((f&k)|((~f)&j),g,f,e,i,h)}function md5_gg(g,f,k,j,e,i,h){return md5_cmn((f&j)|(k&(~j)),g,f,e,i,h)}function md5_hh(g,f,k,j,e,i,h){return md5_cmn(f^k^j,g,f,e,i,h)}function md5_ii(g,f,k,j,e,i,h){return md5_cmn(k^(f|(~j)),g,f,e,i,h)}function safe_add(a,d){var c=(a&65535)+(d&65535);var b=(a>>16)+(d>>16)+(c>>16);return(b<<16)|(c&65535)}function bit_rol(a,b){return(a<<b)|(a>>>(32-b))};
+ </script>
+  <script  language="javascript">
+ // 对Date的扩展，将 Date 转化为指定格式的String 
+// 月(M)、日(d)、小时(h)、分(m)、秒(s)、季度(q) 可以用 1-2 个占位符， 
+// 年(y)可以用 1-4 个占位符，毫秒(S)只能用 1 个占位符(是 1-3 位的数字) 
+// 例子： 
+// (new Date()).Format("yyyy-MM-dd hh:mm:ss.S") ==> 2006-07-02 08:09:04.423 
+// (new Date()).Format("yyyy-M-d h:m:s.S")      ==> 2006-7-2 8:9:4.18 
+Date.prototype.Format = function(fmt) 
+{ //author: meizz 
+  var o = { 
+    "M+" : this.getMonth()+1,                 //月份 
+    "d+" : this.getDate(),                    //日 
+    "h+" : this.getHours(),                   //小时 
+    "m+" : this.getMinutes(),                 //分 
+    "s+" : this.getSeconds(),                 //秒 
+    "q+" : Math.floor((this.getMonth()+3)/3), //季度 
+    "S"  : this.getMilliseconds()             //毫秒 
+  }; 
+  if(/(y+)/.test(fmt)) 
+    fmt=fmt.replace(RegExp.$1, (this.getFullYear()+"").substr(4 - RegExp.$1.length)); 
+  for(var k in o) 
+    if(new RegExp("("+ k +")").test(fmt)) 
+  fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length))); 
+  return fmt; 
+}
+</script>
+
+ <script  language="javascript"> 
+ setStartAndEndTime();
+   //初始化摊销的开始及结束时间
+ function setStartAndEndTime(){ 
+	var   starttime = new Date().Format("yyyy-MM-dd 00:00:00");   
+	var   endtime=new Date().Format("yyyy-MM-dd 23:59:59");  
+	document.getElementById("starttime").value= starttime;
+	document.getElementById("endtime").value= endtime;
+	var date=new Date(); 
+	var orderId=date.getTime(); 
+	document.getElementById("orderId").value= "test"+orderId;
+ } 
+ </script>
+
+</html>
