@@ -75,13 +75,12 @@
    <input type="submit" name="submsts" value="提交测试" style="background: #00a157">
   </form>
 --------------------------------------------------------------------------------------------------------------
-{#获取merkey的脚本#}
 <script>
     function getMerkey(){
         var merkey = null
         $.ajax({
             async:false,
-            {#url:"http://127.0.0.1:20000/admin/login7"前面的地址不需要#}
+            // {#url:"http://127.0.0.1:20000/admin/login7"前面的地址不需要#}
             url:"/admin/getMerkeyAjax",
             type:"post",
             dataType:"json",
@@ -91,11 +90,8 @@
                     merId: $("#merId").val()
                 }),
             success:function (data){
-                {#alert("登录成功")#}
+                // {#alert("登录成功")#}
                 console.log(data)
-                {#console.log(data.status)#}
-                {#console.log(data.time)#}
-                {#console.log(data.merkey)#}
                 merkey = data.merkey
             },
             error:function (){
@@ -125,7 +121,6 @@
 			vip：1047  VIP网邻通刷新  7bb4d5f1f87ae0a2e66ebb5a2a107ece；
 			     1075 VIP在线充返测试 0708cee53ac500be4e7025f90e3cc4ac
 		 */
-   {#var merKey="123";//在pay中的merInfo表中，置顶，团购，单充值，代理商充值，vip充值#}
  /*
   不刷新页面点击按钮获取新订单号
  */

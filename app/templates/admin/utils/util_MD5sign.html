@@ -1,0 +1,67 @@
+{% extends "admin/admin.html" %}
+{% block content %}
+<section class="content-header">
+        <h1>支付测试管理系统</h1>
+        <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> 工具管理</a></li>
+            <li class="active">paycenter的MD5加密</li>
+        </ol>
+    </section>
+<section class="content" id="showcontent">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">MD5加密:paycenter结尾sign   &iampaycenter</h3>
+                    </div>
+                    <form>
+                        <h1>请输入需要加密的字符串</h1>
+<!--                          <input type="text" id="input" name="input"><br><br>-->
+                        <textarea id="input"  name="input" rows="10" cols="50"></textarea><br>
+                         <button type="button" id="MD5sign" onclick="getMD5sign()">加密</button>
+                    </form>
+                        <h1>加密后的字符串</h1>
+                        <textarea id="output" rows="10" cols="50"></textarea>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // $(document).ready(function() {
+        //     $.ajax({
+        //         url: '/util/getMD5signAjax',
+        //         type: 'GET',
+        //         dataType: 'json',
+        //         data:JSON.stringify({
+        //             needMD5string: $("#needMD5string").val(),
+        //         }),
+        //         success: function(data) {
+        //             console.log("验签成功")
+        //             afterMD5string = data.afterMD5string
+        //         }
+        //     });
+        // });
+        function getMD5sign() {
+        var input = document.getElementById("input").value;
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+        if (xhr.readyState == XMLHttpRequest.DONE) {
+            document.getElementById("output").value = xhr.responseText;
+        }
+          }
+        xhr.open('POST', '/admin/getMD5signAjax');
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify({'input': input}));
+}
+    </script>
+{% endblock %}
+{% block js %}
+    <script>
+        $(document).ready(function () {
+            $("#g-12").addClass("active");
+            $("#g-12-1").addClass("active");
+             $("#g-12-2").addClass("active");
+        });
+    </script>
+{% endblock %}

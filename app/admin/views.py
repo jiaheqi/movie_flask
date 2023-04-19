@@ -905,6 +905,38 @@ def getMerkeyAjax():
     print(info['merkey'])
     return jsonify(info)
 
+import hashlib
+def MD5encode(source):
+    hexs = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a',
+            'b', 'c', 'd', 'e', 'f']
+    try:
+        # 获得MD5摘要算法的 hashlib 对象
+        digester = hashlib.md5()
+        sbs = source.encode("UTF8")
+        # 使用指定的字节更新摘要
+        digester.update(sbs)
+        rbs = digester.digest()
+        # 把密文转换成十六进制的字符串形式
+        j = len(rbs)
+        result = []
+        for i in range(j):
+            b = rbs[i]
+            result.append(hexs[b >> 4 & 0xf])
+            result.append(hexs[b & 0xf])
+        return ''.join(result)
+    except Exception as e:
+        return None
+
+
+# 方法只能写在admin的views的文件中
+@admin.route('/getMD5signAjax', methods=['POST'])
+def getMD5signAjax():
+    input_data = request.get_json()
+    input_text = input_data['input']
+    # 这里进行后台处理，比如将文本转为大写
+    output_text = MD5encode(input_text)
+    return jsonify({'output': output_text})
+
 
 # @admin.route('/util/utilMD5', methods=['GET'])
 # def MD5sign():
