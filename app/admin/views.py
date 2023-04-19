@@ -906,6 +906,11 @@ def getMerkeyAjax():
     return jsonify(info)
 
 
+# @admin.route('/util/utilMD5', methods=['GET'])
+# def MD5sign():
+#     return render_template("admin/util/util_MD5sign.html")
+
+
 @admin.route('/getBankTransferRecordResponse', methods=['GET'])
 def reponsetest():
     orderid = datetime.now

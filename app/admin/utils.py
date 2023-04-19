@@ -32,3 +32,10 @@
 #         else:
 #             password = env
 #         return jsonify({"password": password})
+from flask import render_template
+from app.admin import admin
+
+
+@admin.route('/util/utilMD5', methods=['GET'])
+def MD5sign():
+    return render_template("admin/util/util_MD5sign.html")
