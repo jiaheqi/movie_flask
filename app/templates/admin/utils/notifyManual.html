@@ -1,0 +1,108 @@
+{% extends "admin/admin.html" %}
+{% block content %}
+<section class="content-header">
+        <h1>支付测试管理系统</h1>
+        <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> 工具管理</a></li>
+            <li class="active">异步通知手动发送</li>
+        </ol>
+    </section>
+<section class="content" id="showcontent">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">MD5加密:paycenter结尾sign   &iampaycenter</h3>
+                    </div>
+<!--                    <form>-->
+<!--                        <h1>请输入需要加密的字符串</h1>-->
+<!--&lt;!&ndash;                          <input type="text" id="input" name="input"><br><br>&ndash;&gt;-->
+<!--                        <textarea id="input"  name="input" rows="10" cols="50"></textarea><br>-->
+<!--                         <button type="button" id="MD5sign" onclick="getMD5sign()">加密</button>-->
+<!--                    </form>-->
+<!--                    	<form method="post" action="/admin/send_notification">-->
+<!--                            <label for="notification_url">通知URL:</label>-->
+<!--                            <input type="text" id="notification_url" name="notification_url" size="70"><br><br>-->
+<!--                            <label for="notification_params">通知参数:</label>-->
+<!--                            <textarea id="notification_params"  name="notification_params" rows="10" cols="50"></textarea><br>&ndash;&gt;-->
+<!--                            <input type="submit" value="发送通知">-->
+<!--	                    </form>-->
+                         <form>
+                            <label for="notification_url">通知URL:</label>
+                            <input type="text" id="notification_url" name="notification_url" size="70"><br><br>
+                            <label for="notification_params">通知参数:</label>
+                            <textarea id="notification_params"  name="notification_params" rows="10" cols="50"></textarea><br>------>
+                            <button type="button" id="Notify" onclick="sendNotify2()" style="background: darkseagreen">发送通知</button>
+	                    </form>
+                         <h2>通知结果：200表示成功</h2>
+                    <label for="notification_params" style="">通知结果:</label>
+                    <textarea id="output"></textarea>
+                </div>
+            </div>
+        </div>
+    </section>
+     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+    //     function sendNotify(){
+    //         $.ajax({
+    //         async:false,
+    //         // {#url:"http://127.0.0.1:20000/admin/login7"前面的地址不需要#}
+    //         url:"/admin/send_notification",
+    //         type:"post",
+    //         dataType:"json",
+    //         //data为要传递给后端的数据，使用JSON.stringify()转换为json格式
+    //         data:JSON.stringify({
+    //                 notification_url:   $("#notification_url").val(),
+    //                 notification_params: $("#notification_params").val()
+    //             }),
+    //         success:function (data){
+    //             console.log(data)
+    //             document.getElementById("output").value = data.output
+    //         },
+    //         error:function (){
+    //             alert("发送通知失败")
+    //             console.log("***********")
+    //         },
+    //     });
+    // }
+    </script>
+    <script>
+        // $(document).ready(function() {
+        //     $.ajax({
+        //         url: '/util/getMD5signAjax',
+        //         type: 'GET',
+        //         dataType: 'json',
+        //         data:JSON.stringify({
+        //             needMD5string: $("#needMD5string").val(),
+        //         }),
+        //         success: function(data) {
+        //             console.log("验签成功")
+        //             afterMD5string = data.afterMD5string
+        //         }
+        //     });
+        // });
+        function sendNotify2() {
+        var notification_url = document.getElementById("notification_url").value;
+        var notification_params = document.getElementById("notification_params").value;
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+        if (xhr.readyState == XMLHttpRequest.DONE) {
+            document.getElementById("output").value = xhr.responseText;
+        }
+          }
+        xhr.open('POST', '/admin/send_notification');
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify({'notification_url': notification_url,'notification_params':notification_params}));
+}
+    </script>
+
+{% endblock %}
+{% block js %}
+    <script>
+        $(document).ready(function () {
+            $("#g-12").addClass("active");
+            $("#g-12-1").addClass("active");
+             $("#g-12-2").addClass("active");
+        });
+    </script>
+{% endblock %}

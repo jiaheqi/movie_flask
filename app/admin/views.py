@@ -7,6 +7,7 @@ import os
 import uuid
 from functools import wraps
 
+import requests
 from flask import render_template, url_for, redirect, flash, session, jsonify
 from flask import request
 from werkzeug.utils import secure_filename
@@ -905,7 +906,10 @@ def getMerkeyAjax():
     print(info['merkey'])
     return jsonify(info)
 
+
 import hashlib
+
+
 def MD5encode(source):
     hexs = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a',
             'b', 'c', 'd', 'e', 'f']
@@ -935,12 +939,27 @@ def getMD5signAjax():
     input_text = input_data['input']
     # 这里进行后台处理，比如将文本转为大写
     output_text = MD5encode(input_text)
-    return jsonify({'output': output_text})
+    return jsonify({'MD5signResult': output_text})
 
 
-# @admin.route('/util/utilMD5', methods=['GET'])
-# def MD5sign():
-#     return render_template("admin/util/util_MD5sign.html")
+@admin.route('/send_notification', methods=['POST'])
+def send_notification():
+    headers = {'Content-Type': 'application/json'}
+    input_data = request.get_json()
+    notification_url = input_data['notification_url']
+    notification_params = input_data['notification_params']
+    response = requests.post(notification_url, notification_params, headers)
+    # 在这里模拟异步通知的发送，可以根据具体需求自定义
+    # 例如使用requests库向通知URL发送POST请求，请求参数为notification_params
+    print(response.status_code)
+    print(response)
+    status_code = response.status_code
+    # if 200 == status_code:
+    #     return '通知发送成功！'
+    #
+    # else:
+    #     return '通知异常'
+    return jsonify({'notifyResult': status_code})
 
 
 @admin.route('/getBankTransferRecordResponse', methods=['GET'])
