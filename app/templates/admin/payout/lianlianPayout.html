@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>连连打款</title>
+      <style type="text/css">
+	  input{ width:400px; color:#333;font-size:14px; font-family:"微软雅黑";	}
+  </style>
+    <script src="http://code.jquery.com/jquery-1.4.1.min.js"></script>
+</head>
+<body>
+  <h3 style="color: red">请求网关的域名(动态化action)：打款和查询请求的url都输入这里然后动态跳转</h3>
+  <input type="url" id="url-input"><br/>
+ <p>
+     打款域名：https://payment20153test.58v5.cn/remit <br>
+     查询域名：https://payment20153test.58v5.cn/remit/queryorder<br>
+     queryorder内部调用：https://payment20153test.58v5.cn/remit/bankqueryorder<br>
+     云直连查询虚拟渠道绑卡信息：https://payment20153test.58v5.cn/queryManagementBankCard<br>
+     连连打款确认：http://payment20153test.58v5.cn/remitconfirm<br>
+     连连查询打款凭证：http://payment68test.58v5.cn/remit/getvoucher
+ </p>
+ <h1>连连打款接口/remit</h1>
+ <form action="test" method="POST" target='_blank' class="show"   id="pay" >
+   outTradeNo：<input type="text" name="orderId" id="orderId" value="test"><a href="javascript:void(0)" onClick="setOrderId()">获取新订单号</a><br/>
+   merId：<input type="text" name="merId" id="merId" value="5001">需要使用渠道下面配置的merid<br/>
+   channelId：<input type="text" name="channelId" id="channelId" value="258">测试/沙箱：258：202003200002826007 <br/>
+   partnerId：<input type="text" name="partnerId" id="partnerId" value="10008">测试：沙箱：10036<br/>
+   totalFee：<input type="text" name="orderMoney" id="orderMoney" value="0.01"><font color='red'>加密为两位小数</font><br/>
+   productName：<input type="text" name="productName" id="productName" value="打款测试"><br/>
+   userTrueName：<input type="text" name="userTrueName" id="userTrueName" value="贾赫琦"><br/>
+     bankCode：<input type="text" name="bankCode" id="bankCode" value="03080000"><b style="color: red">*如果bankCardFlag为对公打款（即 1）的时候此参数必传</b>
+     招商银行03080000连连开放平台地址：https://open.lianlianpay.com/docs/resources/bank-codes.html<br/>
+     bankName：<input type="text" name="bankName" id="bankName" value="招商银行">非必传<br/>
+     bankCardFlag：<input type="text" name="bankCardFlag" id="bankCardFlag" value="0">是否是对公单款（0对私 ，1对公) 默认不传为对私打款<b style="color: red">*对公打款必传</b><br/>
+     needCert：<input type="text" name="needCert" id="needCert" value="1">是否需要下载打款凭证，1 需要下载凭证，默认不传递<br/>
+   remark：<input type="text" name="remark" id="remark" value="打款测试remark"><br/>
+   notifyUrl：<input type="text" name="notifyUrl" id="notifyUrl" value="http://paycenter.58.com/test/sendNotify"><br/>
+   tradeTypeCode：<input type="text" name="tradeTypeCode" id="tradeTypeCode" value="BYTF"><br/>
+   remitInfoBOList：<input type="text" style="width: 300px" name="remitInfoBOList" style="width: -moz-fit-content" id="remitInfoBOList" value="[{@payeeName@:@贾赫琦@,@payeeAccount@:@6214830175425668@,@totalFee@:@0.01@,@outTradeNo@:@20230511000@,@payeeBranchBankCode@:@102100099996@,@payeeBranchBankName@:@中国工商银行总行清算中心@,@payeeCity@:@BJBJ@,@payeeBankAddress@:@北京市北京市@}]"><br/>
+   sign：<input type="text" name="sign" id="paySign" value="SIGN" > <a href="javascript:void(0)" onClick="getMD5sign()">计算sign</a><br/>
+   <input type="submit" name="submsts" value="提交测试">
+  </form>
+ <h1>连连打款确认接口/remitconfirm</h1>
+ <form action="test" method="POST" target='_blank' class="show"   id="pay" >
+   outTradeNo：<input type="text" name="outTradeNo" id="outTradeNo" value="test"><b style="color: red">业务订单号和gatewayOrderId不能同时为空</b><br/>
+   merId：<input type="text" name="merId" id="merId1" value="5001">需要使用渠道下面配置的merid<br/>
+   channelId：<input type="text" name="channelId" id="channelId1" value="258">测试/沙箱：258：202003200002826007 <br/>
+   partnerId：<input type="text" name="partnerId" id="partnerId1" value="10008">测试：沙箱：10036<br/>
+   gatewayOrderId：<input type="text" name="gatewayOrderId" id="gatewayOrderId" value="打款测试"><b style="color: red">网关订单号（如果传了优先按网关订单号进行匹配,没传按业务订单号匹配)</b><br/>
+   remitConfirmCode：<input type="text" name="remitConfirmCode" id="remitConfirmCode" value="991515">打款申请API返回的确认码<br/>
+   notifyUrl：<input type="text" name="notifyUrl" id="notifyUrl1" value="http://paycenter.58.com/test/sendNotify"><br/>
+
+   sign：<input type="text" name="sign" id="confirmSign" value="SIGN" > <a href="javascript:void(0)" onClick="getMD5signConfirm()">计算sign</a><br/>
+   <input type="submit" name="submsts" value="提交测试">
+  </form>
+<h1>连连查询付款凭证地址/remit/getvoucher</h1>
+ <form action="test" method="POST" target='_blank' class="show"   id="pay" >
+   接入方id：<input type="text" name="partnerId" id="partnerId2" value="10036"><br/>
+   网关订单id：<input type="text" name="gatewayOrderId" id="gatewayOrderId2" value="1241380588355842"><br/>
+   商户ID：<input type="text" name="merId" id="merId2" value="5001"><br/>
+   渠道id：<input type="text" name="channelId" id="channelId2" value="258"><br/>
+   业务订单号：<input type="text" name="outTradeNo" id="outTradeNo2" value=""><br/>
+   订单类型：<input type="text" name="orderType" id="orderType" value="4">4：打款类型<br/>
+   校验码：<input type="text" name="sign" id="voucherSign" value="syh"> <a href="javascript:void(0)" onClick="getMD5signVoucher()">计算sign</a><br/>
+   <input type="submit" name="submsts" value="提交测试">
+  </form>
+</body>
+
+ <script type="text/javascript">
+const form = document.querySelectorAll('form');
+const urlInput = document.querySelector('#url-input');
+form.forEach((form)=>{
+  form.addEventListener('submit', (event) => {
+  event.preventDefault(); // 阻止表单默认的提交行为
+  const url = urlInput.value;
+  form.action = url;
+  form.submit(); // 提交表单，跳转到指定的 URL
+});
+});
+  </script>
+<script type="text/javascript">
+    function getPaySign(){
+		 var bankCardFlag=document.getElementById("bankCardFlag").value;
+         var bankCode=document.getElementById("bankCode").value;
+         var bankName=document.getElementById("bankName").value;
+		 var merId=document.getElementById("merId").value;
+		 var partnerId=document.getElementById("partnerId").value;
+         var channelId=document.getElementById("channelId").value;
+         var needCert=document.getElementById("needCert").value;
+		 var orderId=document.getElementById("orderId").value;
+		 var orderMoney=document.getElementById("orderMoney").value;
+		 var productName=document.getElementById("productName").value;
+		 var remark=document.getElementById("remark").value;
+		 var notifyUrl=document.getElementById("notifyUrl").value;
+		 var remitInfoBOList=document.getElementById("remitInfoBOList").value;
+         var tradeTypeCode=document.getElementById("tradeTypeCode").value;
+         var userTrueName=document.getElementById("userTrueName").value;
+		 var sign = '';
+         sign+="bankCardFlag="+bankCardFlag+"&bankCode="+bankCode+"&bankName="+bankName;
+         sign+="&channelId="+channelId+"&merId="+merId+"&needCert="+needCert+"&notifyUrl="+notifyUrl
+		 sign+= "&orderId="+orderId+"&orderMoney="+orderMoney+ "&partnerId=" +partnerId+"&productName="+productName+"&remark="+remark+"&remitInfoBOList="+remitInfoBOList;
+		 sign+="&tradeTypeCode="+tradeTypeCode+"&userTrueName="+userTrueName;
+         sign+="&a0a8156496c3fb19e559d1bd568180b3"
+		 alert(sign)
+             console.log(sign)
+         return sign;
+	 }
+     function getConfirmSign(){
+		 var merId=document.getElementById("merId1").value;
+		 var partnerId=document.getElementById("partnerId1").value;
+         var channelId=document.getElementById("channelId1").value;
+		 var outTradeNo=document.getElementById("outTradeNo").value;
+		 var gatewayOrderId=document.getElementById("gatewayOrderId").value;
+		 var notifyUrl=document.getElementById("notifyUrl1").value;
+         var remitConfirmCode=document.getElementById("remitConfirmCode").value;
+		 var sign = '';
+         sign+="channelId="+channelId+"&gatewayOrderId="+gatewayOrderId+"&merId="+merId+"&notifyUrl="+notifyUrl;
+		 sign+= "&outTradeNo="+outTradeNo+ "&partnerId=" +partnerId+"&remitConfirmCode="+remitConfirmCode;
+         sign+="&a0a8156496c3fb19e559d1bd568180b3"
+		 alert(sign)
+             console.log(sign)
+         return sign;
+	 }
+       function getVoucherSign(){
+		 var merId=document.getElementById("merId2").value;
+		 var partnerId=document.getElementById("partnerId2").value;
+         var channelId=document.getElementById("channelId2").value;
+		 var outTradeNo=document.getElementById("outTradeNo2").value;
+		 var gatewayOrderId=document.getElementById("gatewayOrderId2").value;
+         var orderType=document.getElementById("orderType").value;
+		 var sign = '';
+         sign+="channelId="+channelId+"&gatewayOrderId="+gatewayOrderId+"&merId="+merId+"&orderType="+orderType;
+		 sign+= "&outTradeNo="+outTradeNo+ "&partnerId=" +partnerId;
+         sign+="&0a7b501cd304ba5596a7130c275a1234"
+		 alert(sign)
+             console.log(sign)
+         return sign;
+	 }
+
+       function getMD5sign() {
+        var input = getPaySign();
+        var xhr = new XMLHttpRequest();
+        var MD5signResult;
+        xhr.onreadystatechange = function() {
+        if (xhr.readyState == XMLHttpRequest.DONE) {
+            var jsonObj = JSON.parse(xhr.responseText) ;
+            console.log(jsonObj)
+             MD5signResult = jsonObj.MD5signResult
+            console.log(MD5signResult)
+            document.getElementById("paySign").value = MD5signResult;
+        }
+          }
+        xhr.open('POST', '/admin/getMD5signAjax');
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify({'input': input}));
+}
+       function getMD5signConfirm() {
+        var input = getConfirmSign();
+        var xhr = new XMLHttpRequest();
+        var MD5signResult;
+        xhr.onreadystatechange = function() {
+        if (xhr.readyState == XMLHttpRequest.DONE) {
+            var jsonObj = JSON.parse(xhr.responseText) ;
+            console.log(jsonObj)
+             MD5signResult = jsonObj.MD5signResult
+            console.log(MD5signResult)
+            document.getElementById("confirmSign").value = MD5signResult;
+        }
+          }
+        xhr.open('POST', '/admin/getMD5signAjax');
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify({'input': input}));
+}
+       function getMD5signVoucher() {
+        var input = getVoucherSign();
+        var xhr = new XMLHttpRequest();
+        var MD5signResult;
+        xhr.onreadystatechange = function() {
+        if (xhr.readyState == XMLHttpRequest.DONE) {
+            var jsonObj = JSON.parse(xhr.responseText) ;
+            console.log(jsonObj)
+             MD5signResult = jsonObj.MD5signResult
+            console.log(MD5signResult)
+            document.getElementById("voucherSign").value = MD5signResult;
+        }
+          }
+        xhr.open('POST', '/admin/getMD5signAjax');
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify({'input': input}));
+}
+ function setOrderId(){
+	var date=new Date();
+	var orderId=date.getTime();
+	document.getElementById("orderId").value= orderId;
+ }
+</script>
+</html>
