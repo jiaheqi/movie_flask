@@ -22,3 +22,14 @@ def set_htmlfilepath(busstype, filename):
     return filename
 
 加密的时候最后要加&iampaycenter
+
+菜单切换是焦点高亮
+
+{% block js %}
+    <script>
+        $(document).ready(function () {
+            $("#g-2").addClass("active");
+            这里的id要对应到grid文件中的li标签的id
+            $("#g-2-7").addClass("active");
+        });
+    </script>

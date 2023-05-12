@@ -257,6 +257,7 @@ def demo_payout(page=None):
     page_data = Demo.query.filter_by(bussType=4).order_by(Demo.addtime.desc()).paginate(page=page)
     return render_template("admin/demo_payout.html", page_data=page_data)
 
+
 # 发起请求
 @admin.route('/wb_demorequest/<int:id>', methods=['GET'])
 def demo_request(id=None):
@@ -371,6 +372,23 @@ def tag_del(id=None):
     db.session.commit()
     flash(u"删除标签成功", "ok")
     return redirect(url_for("admin.tag_list", page=1))
+
+
+# demo删除
+@admin.route('/demo/del/<int:id>/', methods=['GET'])
+def demo_del(id=None):
+    demo = Demo.query.filter_by(id=id).first_or_404()
+    bussType = demo.bussType
+    print(bussType)
+    db.session.delete(demo)
+    db.session.commit()
+    flash(u"删除demo成功", "ok")
+    if bussType == 2:
+        return redirect(url_for("admin.demo_recharge", page=1))
+    elif bussType == 1:
+        return redirect(url_for("admin.demo_pay", page=1))
+    elif bussType == 4:
+        return redirect(url_for("admin.demo_payout", page=1))
 
 
 # 增加电影
