@@ -42,7 +42,7 @@
  -----------------------------------------------------------------------------
      <br/><b>3.1请求充值+支付接口</b>ok <a href="javascript:void(0)" onClick="changeForm('pay')">打开22394004986881</a><br/>
  <form action="http://paycenter.58.com/wb/pay" method="POST" target='_blank' class="show"    id="pay" >
-   商户订单号：<input type="text" name="orderId" id="orderId" value="wdy0614"><br/>
+   商户订单号：<input type="text" name="orderId" id="orderId" value="wdy0614"><a href="javascript:void(0)" onclick="setOrderId()">获取新订单号</a><br/>
    购买用户id：<input type="text" name="buyAccountId" id="buyAccountId" value="76322659039249"><font color='red'>**:当前登录用户id,否则不能支付red4:19345816573953 red2:19170109830913 redTest6:19347532604417(没钱的用户)</font><br/>
    交易金额：<input type="text" name="orderMoney" id="orderMoney" value="0.01"><font color='red'>加密为两位小数</font><br/>
    账户类型：<input type="text" name="accountType" id="accountType" value="1"><font color='red'>必传
@@ -101,7 +101,35 @@
 
 
  </body>
- 
+  <script src="http://code.jquery.com/jquery-1.4.1.min.js"></script>
+ <script>
+    function getMerkey(){
+        var merkey = null
+        $.ajax({
+            async:false,
+            // {#url:"http://127.0.0.1:20000/admin/login7"前面的地址不需要#}
+            url:"/admin/getMerkeyAjax",
+            type:"post",
+            dataType:"json",
+            //data为要传递给后端的数据，使用JSON.stringify()转换为json格式
+            data:JSON.stringify({
+                    userId:   $("#userId").val(),
+                    merId: $("#merId").val()
+                }),
+            success:function (data){
+                // {#alert("登录成功")#}
+                console.log(data)
+                merkey = data.merkey
+            },
+            error:function (){
+                alert("获取merkey失败")
+                console.log("***********")
+            },
+        });
+        console.log(merkey)
+        return merkey
+    }
+</script>
  <script language="javascript"> 
        /**
 	       支付TYPE：<input type="text" name="defPayType" id="defPayType" value="2">
@@ -129,213 +157,10 @@
 		  if(accountType!=''){
 		 	  sign+="&accountType="+accountType;
 		 }
-	
 		      sign+="&buyAccountId="+buyAccountId+"&orderId="+orderId +"&orderMoney="+orderMoney;
 		 if(validPayTime!=''){
 		 	  sign+="&validPayTime="+validPayTime;
 		 }
-		 
-		 if(merId=='1091'){
-		  	merKey='501a41ae75324d7363af72945823b8f2';//1091 招聘精准CPC  推广余额
-		 }
-		 if(merId=='1093'){ 
-		   	merKey='8cf372da019da31d1a956d94eed2b64d';//1093 400电话  58余额
-		 }
-		 if(merId=='1001'){ 
-		   	merKey='338f72f868ba82a37cdb95166cf1fcf3';//1001  团购，交易宝
-		 }
-		 if(merId=='1018'){
-			merKey='127d8eba89149a7aa241eea19d8fcfee';//招聘网邻通竞价  58余额
-		 }
-		 if(merId=='1104'){
-			merKey='bf75e27f8a8222a17c5638430c2605a8';//bf75e27f8a8222a17c5638430c2605a8  正式// 88ed1df188787084d54bcffc001f6826  测试环境
-		 }
-		 if(merId=='1052'){
-		 		merKey='b00fb744f9f5d3f952ad0fc03f62114d';
-		 	}
-		if(merId=='1044'){
-		 	merKey='c24389032902ecae731ea7a7ac362aa9';
-		}
-		 if(merId=='1034'){//58呼转  58余额
-			merKey='0d43a543566f6246d30750a9c59ebc69';
-		 }
-		 if(merId=='1051'){//58余额
-			merKey='3fe8d563958659428dbec9911e453ba0';
-		 }
-		 if(merId=='1022'){//推广余额
-			merKey='127d8eba89149a7aa241eea19d8fcfee';
-		 }
-		  if(merId=='1169'){//推广余额
-			merKey='99f723fcf89dde5102ca445ef1f17c83';
-		 }
-		  if(merId=='1034'){//58呼转  58余额
-			merKey='0d43a543566f6246d30750a9c59ebc69';
-		 }
-		 if(merId=='1051'){//58余额
-			merKey='3fe8d563958659428dbec9911e453ba0';
-		 }
-		 if(merId=='1022'){//推广余额
-			merKey='127d8eba89149a7aa241eea19d8fcfee';
-		 }
-		  if(merId=='1169'){//推广余额
-			merKey='99f723fcf89dde5102ca445ef1f17c83';
-		 }
-		  if(merId=='1110'){//黄页代驾
-			merKey='4c9c2a7654585dca9918b15226880ac7';
-		 }
-	
-		 if(merId=='1020'){//宠物网邻通竞价
-			merKey='127d8eba89149a7aa241eea19d8fcfee';
-		 }
-		 if(merId=='1104'){//宠物网邻通竞价
-			merKey='bf75e27f8a8222a17c5638430c2605a8';
-		 }
-		  if(merId=='32001'){//宠物网邻通竞价
-			merKey='a62a7951c1df8f8f546cdeed33ae84e0';
-		 }
-		   if(merId=='1120'){//宠物网邻通竞价
-			merKey='cbb2076d3fd60dcc83be0a88472defe5';
-		 }
-		 
-		  if(merId=='32009'){//黄页
-			merKey='bed53c689625414f76818d068d1741d7';
-		 }
-		   
-	
-		 if(merId=='32006'){//房产limeng
-			merKey='88a04f1a4cece7a8707cfe550155a44f';
-		 }
-		  if(merId=='32007'){//二手limeng
-			merKey='446929ad0fe15120be5c68dade86206c';
-		 }
-		  if(merId=='32003'){//58汽车推广币测试
-			merKey='e94a3a523c7a2b68418ae05d00cfd2cf';
-		 }if(merId=='22769'){//58汽车推广币测试
-			merKey='c994d1b24bf1a55f5869520bc4271a3a';
-		 }
-		 
-		 		 		 if(merId=='1110') {//交易宝
-			merKey= '4c9c2a7654585dca9918b15226880ac7';
-		 }
-		 
-		 		 		 //白名单现金
-		  if(merId=='1043'){
-			merKey= 'e9deb9ab4f4c335a7fb93474e5379da0';
-		 }
-		
-		//白名单交易宝
-		  if(merId=='1259'){
-			merKey= '658e18225538dd37e73670d29a6aebb4';
-		 }
-		 
-		 		 //白名单房产推广币
-		  if(merId=='1587'){
-			merKey= 'a65e8c384b9436ebd2dd32f761c56577';
-		 }
-		 
-		 //白名单跨线merId: 1042（现金），1302（通用）
-		  if(merId=='1042'){
-			merKey= '901042894a3cf15fb3f17fa48c01fa64';
-		 }
-		  if(merId=='1302'){
-			merKey= '59a48ce8a67d80ff47fe277a501263b4';
-		 }
-		 
-		 		 		  if(merId=='21000'){//房产现金
-			merKey='ea096cc8d499d55679882b974f84614b';
-		 }
-		 
-		  if(merId=='21003'){//房产交易宝
-			merKey='6a096cc8d499d556798821974f84614b';
-		 }
-		 
-		  if(merId=='21004'){//房产现金
-			merKey='7a096cc8d499d556798822974f84614b';
-		 }
-		 
-		  if(merId=='21005'){//房产推广币
-			merKey='8a096cc8d499d556798823974f84614b';
-		 }
-		 
-		  if(merId=='21006'){//房产交易宝
-			merKey='6a096cc8d499d556798821974f84614b';
-		 }
-		 
-		  if(merId=='21007'){//房产现金
-			merKey='7a096cc8d499d556798822974f84614b';
-		 }
-		 
-		  if(merId=='21008'){//房产推广币
-			merKey='8a096cc8d499d556798823974f84614b';
-		 }
-		 		  if(merId=='2901'){//房产推广币
-			merKey='5d3d3e1e0e50c0762140e1ec6e1fdfb4';
-		 }
-		  if(merId=='2241'){//巧房现金
-			merKey='b04526c97c36043c81dfeee78db92ec6';
-		 }
-		 		 if(merId=='2209'){//巧房推广币
-			merKey='7ad5d5fb5bac4c2d5614e66730e8b102';
-		 }
-		 		 		 if(merId=='31233'){//招聘现金
-			merKey='2da82da872ae64675dcd137951a75a4c';
-		 }
-		 		 if(merId=='31239'){//招聘交易宝
-			merKey='582daaacfd1b687c402518f3a3fc1617';
-		 }
-		 		 		 if(merId=='2020'){//安居客现金
-			merKey='7b7a53e239400a13bd6be6c91c4f6c4e';
-		 }
-		 
-		 		 		 if(merId=='2109'){//安居客交易宝
-			merKey='be140af41cec8891add0d58fdf5752db';
-		 }
-		 
-		 		 		 if(merId=='2001'){//公司安币
-			merKey='98fe0277b215b12bb480160ffd27213d';
-		 }
-		 
-		 		 		 if(merId=='2002'){//个人安币
-			merKey='9cc59cfee2f4b3316e6e4c6f77edaa2c';
-		 }
-		 		 		 		 if(merId=='3996'){//赶集余额
-			merKey='1eaa4f8e77439bcaf99d3ab653d79b84';
-		 }
-		 		 		 		 if(merId=='3001'){//赶集推广币
-			merKey='908c9a564a86426585b29f5335b619bc';
-		 }
-		 		 		if(merId=='1667'){//英才专项款
-			merKey='5c459081c623bad9f4990dcb99c886c0';
-		 }
-
-				 		 		if(merId=='6301'){//58车推广余额
-			merKey='08647b2aec5874fd180485ff5a6b34b7';
-		 }
-		 			if(merId=='3844'){//同镇推广币
-			merKey='c0e14d8bd0adccad3bbf5b24904f5dc0';
-		 }
-		 		 	if(merId=='1527'){//社交推广币
-			merKey='076aed3cef24b046cbfae8e51c5bd2f1';
-		 }
-		 		 if(merId=='510'){//白菜推广币
-			merKey='705ae65a8a31d4b9d8470dda387304f8';
-		 }
-		 		 	if(merId=='10914'){//招才猫IAP余额
-			merKey='5cb48f6d2c8b020e26cf3424a82b449f';
-		 }		 	if(merId=='6310'){//58同镇交易宝余额
-			merKey='0ad7273044067d8f319e2de98dedb6df';
-		 }	if(merId=='1346'){//58同镇交易宝余额
-			merKey='e2c92c1edac2fc2546333f1f9372c303';
-		 }	if(merId=='1416'){//赶集IAP余额
-			merKey='1eff6189a96ed711a14296a69bddf8e0';
-		}
-			if(merId=='4376'){//招才猫IAP余额
-			merKey='ffbbb7d8090ea6964b6a24e268404c21';
-		}
-		if(merId=='2225'){//房产钻
-			merKey='b19e607a396f57ad0fb9b0799c189351';
-		}
-		 
 		 var starttime=document.getElementById("starttime").value;
 		 var endtime=document.getElementById("endtime").value;
 		 if(merId=='32006'||merId=='1110'||merId=='32009'||merId=='1259'||merId=='1587'||merId=='1042'||merId=='1302'||merId=='1104'||merId=='1018'||merId=='1043'||merId=='1051'||merId=='1022'||merId=='32001'||merId=='32003'||merId=='32007'||merId=='21003'||merId=='21004'||merId=='21005'){
@@ -344,7 +169,6 @@
 		 if(merId=='32006'||merId=='1110'||merId=='32009'||merId=='1259'||merId=='1587'||merId=='1042'||merId=='1302'||merId=='1104'||merId=='1018'||merId=='1043'||merId=='1051'||merId=='1022'||merId=='32001'||merId=='32003'||merId=='32007'||merId=='21003'||merId=='21004'||merId=='21005'){
 		    sign+="&endtime="+endtime;
 		 }
-		 
 		 var balancepaid=document.getElementById("balancePaid").value;
 		 if(balancepaid!=''){
 			sign+="&balancePaid="+balancepaid;
@@ -353,7 +177,8 @@
 			sign+="&limitPay="+limitPay;
 		 }
 		 sign+="&disableChannel=transferPay";	
-		 // sign+="&disableChannel="+disableChannel;	
+		 // sign+="&disableChannel="+disableChannel;
+         merKey = getMerkey();
 		 sign+=merKey;
 		 document.getElementById("paySign").value= hex_md5(sign);
 
@@ -405,7 +230,12 @@ Date.prototype.Format = function(fmt)
 	var date=new Date(); 
 	var orderId=date.getTime(); 
 	document.getElementById("orderId").value= "test"+orderId;
- } 
+ }
+ function setOrderId(){
+     const date = new Date();
+     const orderId = date.getTime();
+     document.getElementById("orderId").value= "test"+orderId;
+ }
  </script>
 
 </html>

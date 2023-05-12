@@ -91,6 +91,8 @@ def set_htmlfilepath(busstype, filename):
         filename = "pay/" + filename
     elif busstype == 2:
         filename = "recharge/" + filename
+    elif busstype == 4:
+        filename = "payout/" + filename
     return filename
 
 
@@ -247,6 +249,13 @@ def demo_pay(page=None):
     print(page_data)
     return render_template("admin/demo_pay.html", page_data=page_data)
 
+
+@admin.route('/tag/demoPayOut/<int:page>/', methods=['GET'])
+def demo_payout(page=None):
+    if page is None:
+        page = 1
+    page_data = Demo.query.filter_by(bussType=4).order_by(Demo.addtime.desc()).paginate(page=page)
+    return render_template("admin/demo_payout.html", page_data=page_data)
 
 # 发起请求
 @admin.route('/wb_demorequest/<int:id>', methods=['GET'])
@@ -899,7 +908,6 @@ def getMerkeyAjax():
     print(json_data)
     userId = json_data.get("userId")
     merId = json_data.get("merId")
-
     # 给前端传输json数据
     info = dict()
     info['merkey'] = getMerkey(id=merId)
@@ -937,8 +945,10 @@ def MD5encode(source):
 def getMD5signAjax():
     input_data = request.get_json()
     input_text = input_data['input']
+    print(input_text)
     # 这里进行后台处理，比如将文本转为大写
     output_text = MD5encode(input_text)
+    print(output_text)
     return jsonify({'MD5signResult': output_text})
 
 

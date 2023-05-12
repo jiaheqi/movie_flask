@@ -1,0 +1,24 @@
+
+新增一个菜单的步骤：
+1.grid.html中增加一个菜单选项
+<li id="g-2-7">
+<a href="{{ url_for('admin.demo_payout',page=1) }}">
+<i class="fa fa-circle-o"></i> 打款demo列表
+</a>
+</li>
+2.templates中添加菜单的首页
+3.view中提那几acontroller
+def demo_payout(page=None)
+4.添加demo中添加demo
+5.调整demo中的一些参数信息
+注意：新增交易类型的demo的时候需要添加路径类型
+def set_htmlfilepath(busstype, filename):
+    if busstype == 1:
+        filename = "pay/" + filename
+    elif busstype == 2:
+        filename = "recharge/" + filename
+    elif busstype == 4:
+        filename = "payout/" + filename
+    return filename
+
+加密的时候最后要加&iampaycenter

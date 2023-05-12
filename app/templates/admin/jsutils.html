@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+</body>
+{#实现根据输入的地址动态化action#}
+ <script type="text/javascript">
+const form = document.querySelector('form');
+const urlInput = document.querySelector('#url-input');
+form.addEventListener('submit', (event) => {
+  event.preventDefault(); // 阻止表单默认的提交行为
+  const url = urlInput.value;
+  form.action = url;
+  form.submit(); // 提交表单，跳转到指定的 URL
+});
+ </script>
+{#同一个页面多个submit的时候实现动态化action#}
+ <script type="text/javascript">
+const form = document.querySelectorAll('form');
+const urlInput = document.querySelector('#url-input');
+form.forEach((form)=>{
+  form.addEventListener('submit', (event) => {
+  event.preventDefault(); // 阻止表单默认的提交行为
+  const url = urlInput.value;
+  form.action = url;
+  form.submit(); // 提交表单，跳转到指定的 URL
+});
+});
+  </script>
+{#根据merid查询merkey#}
+ <script  type="text/javascript">
+     function getMerkey(){
+        var merkey = null
+        $.ajax({
+            async:false,
+            url:"/admin/getMerkeyAjax",
+            type:"post",
+            dataType:"json",
+            data:JSON.stringify({
+                    userId:   $("#userId").val(),
+                    merId: $("#merId").val()
+                }),
+            success:function (data){
+                console.log(data)
+                merkey = data.merkey
+            },
+            error:function (){
+                alert("获取merkey失败")
+                console.log("***********")
+            },
+        });
+        console.log(merkey)
+        return merkey
+    }
+</script>
+{#实现md5的加密，调用view中的方法#}
+<script  type="text/javascript">
+        function getMD5sign() {
+        var input = getPaySign();
+        var xhr = new XMLHttpRequest();
+        var MD5signResult;
+        xhr.onreadystatechange = function() {
+        if (xhr.readyState == XMLHttpRequest.DONE) {
+            var jsonObj = JSON.parse(xhr.responseText) ;
+            console.log(jsonObj)
+             MD5signResult = jsonObj.MD5signResult
+            console.log(MD5signResult)
+            document.getElementById("paySign").value = MD5signResult;
+        }
+          }
+        xhr.open('POST', '/admin/getMD5signAjax');
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify({'input': input}));
+}
+</script>
+</html>
