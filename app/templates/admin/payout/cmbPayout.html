@@ -39,6 +39,7 @@
   <h3 style="color: red">请求网关的域名(动态化action)：打款和查询请求的url都输入这里然后动态跳转</h3>
   <input type="url" id="url-input"><br/>
  <p>
+     线上外网域名：https://gateway.58.com    内网域名：http://gateway.58dns.org（不能用https）<br>
      打款域名：https://payment20153test.58v5.cn/v2/remit <br>
      查询域名：https://payment20153test.58v5.cn/remit/queryorder<br>
      queryorder内部调用：https://payment20153test.58v5.cn/remit/bankqueryorder<br>
@@ -46,26 +47,26 @@
  </p>
  <h1>招行打款接口/v2/remit：银企直连+云直连</h1>
  <form action="test" method="POST" target='_blank' class="show"   id="pay" >
-   outTradeNo：<input type="text" name="orderId" id="orderId" value="test"><a href="javascript:void(0)" onClick="setOrderId()">获取新订单号(和UniqueNo同步)</a><br/>
-   userId：<input type="text" name="userId" id="userId" value="76322659039249">测试：76322659039249 沙箱：65064644942866<br/>
+   outTradeNo：<input type="text" name="outTradeNo" id="outTradeNo" value="test"><a href="javascript:void(0)" onClick="setOrderId()">获取新订单号(和UniqueNo同步)</a><br/>
+   userId：<input type="text" name="userId" id="userId" value="65064644942866">测试：76322659039249 沙箱：65064644942866<br/>
    merId：<input type="text" name="merId" id="merId" value="1604">测试：沙箱：1604<br/>
-   channelId：<input type="text" name="channelId" id="channelId" value="1556"><br/>
-   partnerId：<input type="text" name="partnerId" id="partnerId" value="10001">测试：沙箱：10036<br/>
-   totalFee：<input type="text" name="orderMoney" id="orderMoney" value="0.01"><font color='red'>加密为两位小数</font><br/>
+   channelId：<input type="text" name="channelId" id="channelId" value="1778">招聘110949625510203云直连对私：1778云直连对公：1555   五八110905826410701银企对私：424银企对公959 <br/>
+   partnerId：<input type="text" name="partnerId" id="partnerId" value="10036">测试：沙箱：10036<br/>
+   totalFee：<input type="text" name="totalFee" id="totalFee" value="0.01"><font color='red'>加密为两位小数</font><br/>
    productName：<input type="text" name="productName" id="productName" value="打款测试"><br/>
    remark：<input type="text" name="remark" id="remark" value="打款测试remark"><br/>
    notifyUrl：<input type="text" name="notifyUrl" id="notifyUrl" value="http://paycenter.58.com/test/sendNotify"><br/>
    tradeTypeCode：<input type="text" name="tradeTypeCode" id="tradeTypeCode" value="BYTF"><br/>
-   remitInfoBOList：<input type="text" style="width: 300px" name="remitInfoBOList" id="remitInfoBOList" value="[{@payeeName@:@贾赫琦@,@payeeAccount@:@6214830175425668@,@totalFee@:@0.01@,@outTradeNo@:@20230511000@,@payeeBranchBankCode@:@102100099996@,@payeeBranchBankName@:@中国工商银行总行清算中心@,@payeeCity@:@BJBJ@,@payeeBankAddress@:@北京市北京市@}]"><br/>
+   remitInfoBOList：<input type="text" style="width: 1500px" name="remitInfoBOList" id="remitInfoBOList" value="[{@payeeName@:@贾赫琦@,@payeeAccount@:@6214830175425668@,@totalFee@:@0.01@,@outTradeNo@:@20230511000@,@payeeBranchBankCode@:@102100099996@,@payeeBranchBankName@:@中国工商银行总行清算中心@,@payeeCity@:@BJBJ@,@payeeBankAddress@:@北京市北京市@}]"><br/>
    sign：<input type="text" name="sign" id="paySign" value="SIGN"> <a href="javascript:void(0)" onClick="getMD5sign()">计算sign</a><br/>
    <input type="submit" name="submsts" value="提交测试">
   </form>
  <h1>招行打款查询接口remit/queryorder</h1>
  <form action="test" method="POST" target='_blank' class="show"   id="queryOrder">
-     merId：<input type="text" name="merId" id="merId1" value="1000">测试：1000沙箱：1604<br/>
-   channelId：<input type="text" name="channelId" id="channelId1" value="1506"><br/>
-     outTradeNo：<input type="text" name="outTradeNo" id="outTradeNo" value="1241354088747073"><br/>
-     partnerId：<input type="text" name="partnerId" id="partnerId1" value="10001">测试：沙箱：10036<br/>
+     merId：<input type="text" name="merId" id="merId1" value="1604">测试：1000沙箱：1604<br/>
+   channelId：<input type="text" name="channelId" id="channelId1" value="1778"><br/>
+     outTradeNo：<input type="text" name="outTradeNo" id="outTradeNo1" value="1241354088747073"><br/>
+     partnerId：<input type="text" name="partnerId" id="partnerId1" value="10036">测试：沙箱：10036<br/>
      orderType：<input type="text" name="orderType" id="orderType" value="4">打款类型：4 <br/>
      sign：<input type="text" name="sign" id="querySign" value="SIGN"> <a href="javascript:void(0)" onClick="getMD5signQuery()">计算sign</a><br/>
    <input type="submit" name="submstss" value="提交测试">
@@ -74,7 +75,7 @@
  <p>https://payment20153test.58v5.cn/queryManagementBankCard?channelId=1905&partnerId=10008&sign=33fda28e2b6a313f2efbc1e62ebbd63d</p>
  <form action="test" method="POST" target='_blank' class="show"   id="queryOrder">
      channelId：<input type="text" name="channelId" id="channelId2" value="1905"><br/>
-     partnerId：<input type="text" name="partnerId" id="partnerId2" value="10008">测试：沙箱：10036<br/>
+     partnerId：<input type="text" name="partnerId" id="partnerId2" value="10008">测试10008：a0a8156496c3fb19e559d1bd568180b3：沙箱：10036：0a7b501cd304ba5596a7130c275a1234<br/>
      sign：<input type="text" name="sign" id="queryBankSign" value="SIGN"> <a href="javascript:void(0)" onClick="getMD5signQueryBank()">计算sign</a><br/>
    <input type="submit" name="submstss" value="提交测试">
  </form>
@@ -85,8 +86,8 @@
 		 var merId=document.getElementById("merId").value;
 		 var partnerId=document.getElementById("partnerId").value;
          var channelId=document.getElementById("channelId").value;
-		 var orderId=document.getElementById("orderId").value;
-		 var orderMoney=document.getElementById("orderMoney").value;
+		 var outTradeNo=document.getElementById("outTradeNo").value;
+		 var totalFee=document.getElementById("totalFee").value;
 		 var productName=document.getElementById("productName").value;
 		 var remark=document.getElementById("remark").value;
 		 var notifyUrl=document.getElementById("notifyUrl").value;
@@ -95,9 +96,9 @@
 		 var sign = '';
          {#sign的原始串的拼接顺序必须是这个#}
          sign+="channelId="+channelId+"&merId="+merId+"&notifyUrl="+notifyUrl
-		 sign+= "&orderId="+orderId+"&orderMoney="+orderMoney+ "&partnerId=" +partnerId+"&productName="+productName+"&remark="+remark+"&remitInfoBOList="+remitInfoBOList;
-		 sign+="&tradeTypeCode="+tradeTypeCode+"&userId="+userId;
-         sign+="&iampaycenter"
+		 sign+= "&outTradeNo="+outTradeNo+ "&partnerId=" +partnerId+"&productName="+productName+"&remark="+remark+"&remitInfoBOList="+remitInfoBOList;
+		 sign+= "&totalFee="+totalFee+"&tradeTypeCode="+tradeTypeCode+"&userId="+userId;
+         sign+= "&0a7b501cd304ba5596a7130c275a1234"
          {#var merKey=getMerkey();#}
 		 {#sign+=merKey;#}
 		 alert(sign)
@@ -107,20 +108,20 @@
 		 var merId=document.getElementById("merId1").value;
 		 var partnerId=document.getElementById("partnerId1").value;
          var channelId=document.getElementById("channelId1").value;
-		 var outTradeNo=document.getElementById("outTradeNo").value;
+		 var outTradeNo=document.getElementById("outTradeNo1").value;
          var orderType=document.getElementById("orderType").value;
          var sign = ''
           sign += "channelId="+channelId+"&merId="+merId+"&orderType="+orderType+ "&outTradeNo="+outTradeNo+"&partnerId=" +partnerId;
-          sign+="&a0a8156496c3fb19e559d1bd568180b3";
+          sign+="&0a7b501cd304ba5596a7130c275a1234";
          alert(sign)
          return sign;
      }
           function getQueryBankSign(){
-		 var partnerId=document.getElementById("partnerId1").value;
-         var channelId=document.getElementById("channelId1").value;
+		 var partnerId=document.getElementById("partnerId2").value;
+         var channelId=document.getElementById("channelId2").value;
          var sign = ''
           sign += "channelId="+channelId+"&partnerId=" +partnerId;
-          sign+="&iampaycenter";
+          sign+="&a0a8156496c3fb19e559d1bd568180b3";
          alert(sign)
          return sign;
      }
@@ -220,8 +221,8 @@ form.forEach((form)=>{
  <script  language="javascript">//初始化摊销的开始及结束时间
  function setOrderId(){
 	var date=new Date();
-	var orderId=date.getTime();
-	document.getElementById("orderId").value= orderId;
+	var outTradeNo=date.getTime();
+	document.getElementById("outTradeNo").value= outTradeNo;
  }
  </script>
 </html>

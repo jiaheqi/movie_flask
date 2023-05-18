@@ -18,5 +18,9 @@ class Admin(db.Model):
         return "<Admin %r>" % self.name
 
     def check_pwd(self, pwd):
-        from werkzeug.security import check_passFword_hash
+        from werkzeug.security import check_password_hash
+        print("----admin的pwd"+self.pwd)
         return check_password_hash(self.pwd, pwd)
+
+
+

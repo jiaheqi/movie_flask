@@ -4,7 +4,6 @@ from datetime import datetime
 from app.model.base import db
 
 
-
 class User(db.Model):
     __tablename__ = 'user'  # 表名
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)  # 编号

@@ -8,7 +8,7 @@ import uuid
 from functools import wraps
 
 import requests
-from flask import render_template, url_for, redirect, flash, session, jsonify
+from flask import render_template, url_for, redirect, flash, session, jsonify, abort
 from flask import request
 from werkzeug.utils import secure_filename
 
@@ -56,7 +56,7 @@ def admin_login_req(f):
     return decorated_function
 
 
-# # 权限控制装饰器
+# 权限控制装饰器
 # def admin_auth(f):
 #     @wraps(f)
 #     def decorated_function(*args, **kwargs):
@@ -109,7 +109,10 @@ def login():
     if form.validate_on_submit():
         data = form.data
         print(data)
-        # admin = Admin.query.filter_by(name=data["account"]).first()
+        print(data["pwd"])
+        admin = Admin.query.filter_by(name=data["account"]).first()
+        print(admin)
+        # print(admin.check_pwd(data["pwd"]))
         # if not admin.check_pwd(data["pwd"]):
         #     flash(u"密码错误", "err")
         #     return redirect(url_for("admin.login"))
